@@ -162,10 +162,6 @@ apiRouter.post('/experiments/:experimentId/generate', responseController.generat
 apiRouter.get('/responses/:id', responseController.getResponseById.bind(responseController));
 apiRouter.post('/responses/compare', responseController.compareResponses.bind(responseController));
 
-// LLM provider management routes
-const llmRoute = require('./src/routes/llm');
-apiRouter.use('/llm', llmRoute);
-
 // Mount API routes
 app.use('/api/v2', apiRouter);
 
@@ -174,7 +170,6 @@ app.use('/api/experiments', legacyExperimentsRoute);
 app.use('/api/responses', legacyResponsesRoute);
 app.use('/api/metrics', legacyMetricsRoute);
 app.use('/api/export', legacyExportRoute);
-app.use('/api/llm', require('./src/routes/llm'));
 
 // Static file serving for frontend (if needed)
 if (process.env.NODE_ENV === 'production') {

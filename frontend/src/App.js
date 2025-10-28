@@ -15,6 +15,8 @@ import Experiment from './pages/Experiment';
 import Analysis from './pages/Analysis';
 import Comparison from './pages/Comparison';
 import About from './pages/About';
+import Settings from './pages/Settings';
+import SettingsTest from './pages/SettingsTest';
 
 function App() {
   return (

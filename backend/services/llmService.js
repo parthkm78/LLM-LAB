@@ -154,27 +154,12 @@ class LLMService {
       temperature = 0.7,
       top_p = 1.0,
       max_tokens = 150,
-      model = 'gemini-1.5-flash' // Default to free tier model
+      model = 'gemini-pro'
     } = parameters;
 
     const startTime = Date.now();
 
-    // Map model names to proper Google AI model names
-    let actualModel = model;
-    const modelMapping = {
-      'gemini-pro': 'gemini-1.5-flash', // Fallback legacy to new free model
-      'gemini-1.5-flash': 'gemini-1.5-flash',
-      'gemini-1.5-pro': 'gemini-1.5-pro',
-      'text-bison-001': 'text-bison-001'
-    };
-    
-    if (modelMapping[model]) {
-      actualModel = modelMapping[model];
-    }
-
-    console.log(`🤖 Using Google AI model: ${actualModel}`);
-
-    const geminiModel = this.googleAI.getGenerativeModel({ model: actualModel });
+    const geminiModel = this.googleAI.getGenerativeModel({ model });
     
     const generationConfig = {
       temperature,
@@ -199,7 +184,7 @@ class LLMService {
 
     return {
       content: text,
-      model: actualModel,
+      model,
       temperature,
       top_p,
       frequency_penalty: 0, // Google AI doesn't have frequency_penalty
@@ -319,16 +304,6 @@ class LLMService {
 
   getCurrentProvider() {
     return this.provider;
-  }
-
-  // Get service status (for compatibility with server.js)
-  getStatus() {
-    return {
-      initialized: !this.isMockMode,
-      mock_mode: this.isMockMode,
-      provider: this.provider,
-      ready: true
-    };
   }
 
   // Test connection to the current LLM provider
