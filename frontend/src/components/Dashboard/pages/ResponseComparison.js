@@ -15,7 +15,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ArrowPathIcon,
-  CpuChipIcon
+  CpuChipIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 import { 
   HeartIcon as HeartIconSolid,
@@ -28,8 +29,8 @@ import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, Cartesia
 const ResponseComparison = () => {
   // Core State Management
   const [selectedResponses, setSelectedResponses] = useState([]);
-  const [viewMode, setViewMode] = useState('all-responses'); // 'all-responses', 'search-and-select', 'detailed-comparison', 'advanced-analysis'
-  const [comparisonMode, setComparisonMode] = useState('comprehensive'); // 'comprehensive', 'metrics-only', 'content-only', 'performance'
+  const [viewMode, setViewMode] = useState('search-and-select'); // 'search-and-select', 'comparison-analysis'
+  const [comparisonTab, setComparisonTab] = useState('overview'); // 'overview', 'quality-metrics', 'detailed-analysis', 'visual-comparison'
   
   // Search and Filter State
   const [searchQuery, setSearchQuery] = useState('');
@@ -278,17 +279,28 @@ const ResponseComparison = () => {
   };
 
   const addToComparison = (response) => {
-    if (selectedResponses.length < 6 && !selectedResponses.some(r => r.id === response.id)) {
-      setSelectedResponses(prev => [...prev, response]);
+    if (selectedResponses.length < 2 && !selectedResponses.some(r => r.id === response.id)) {
+      const newSelection = [...selectedResponses, response];
+      setSelectedResponses(newSelection);
+      
+      // Automatically switch to comparison view when 2 responses are selected
+      if (newSelection.length === 2) {
+        setViewMode('comparison-analysis');
+      }
     }
   };
 
   const removeFromComparison = (responseId) => {
     setSelectedResponses(prev => prev.filter(r => r.id !== responseId));
+    // Return to search if less than 2 responses
+    if (selectedResponses.length <= 2) {
+      setViewMode('search-and-select');
+    }
   };
 
   const clearComparison = () => {
     setSelectedResponses([]);
+    setViewMode('search-and-select');
   };
 
   // Advanced Search Interface Component
@@ -1262,6 +1274,544 @@ const ResponseComparison = () => {
     );
   };
 
+  // Comprehensive 2-Response Comparison Analysis
+  const ComparisonAnalysisView = () => {
+    if (selectedResponses.length !== 2) {
+      return (
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50 flex items-center justify-center p-8">
+          <div className="bg-white rounded-2xl border border-gray-200 shadow-xl p-12 text-center max-w-2xl">
+            <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+              <ArrowsRightLeftIcon className="w-12 h-12 text-blue-600" />
+            </div>
+            <h2 className="text-3xl font-bold text-gray-900 mb-4">Select 2 Responses to Compare</h2>
+            <p className="text-gray-600 text-lg mb-8">
+              Choose exactly 2 responses from the library to perform comprehensive quality analysis and comparison.
+            </p>
+            <div className="flex items-center justify-center space-x-4 mb-8">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                  {selectedResponses.length}
+                </div>
+                <span className="text-gray-700 font-medium">of 2 selected</span>
+              </div>
+            </div>
+            <button
+              onClick={() => setViewMode('search-and-select')}
+              className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-bold text-lg shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+              Browse Response Library
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    const [responseA, responseB] = selectedResponses;
+
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+        {/* Comparison Header */}
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white py-8">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <h1 className="text-4xl font-bold mb-2">Comprehensive Response Analysis</h1>
+                <p className="text-blue-100 text-lg">
+                  Advanced quality metrics and detailed comparison between {responseA.model} and {responseB.model}
+                </p>
+              </div>
+              <div className="flex items-center space-x-3 mt-4 lg:mt-0">
+                <button
+                  onClick={() => setViewMode('search-and-select')}
+                  className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl hover:bg-white/30 transition-all duration-300"
+                >
+                  <ArrowPathIcon className="w-4 h-4" />
+                  <span>Change Selection</span>
+                </button>
+                <button
+                  onClick={clearComparison}
+                  className="flex items-center space-x-2 px-4 py-2 bg-red-500/80 backdrop-blur-sm border border-red-400/30 text-white rounded-xl hover:bg-red-600/80 transition-all duration-300"
+                >
+                  <XMarkIcon className="w-4 h-4" />
+                  <span>Clear All</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Comparison Navigation Tabs */}
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex space-x-8 overflow-x-auto">
+              {[
+                { id: 'overview', label: 'Side-by-Side Overview', icon: EyeIcon },
+                { id: 'quality-metrics', label: 'Quality Metrics Analysis', icon: ChartBarIcon },
+                { id: 'detailed-analysis', label: 'Detailed Breakdown', icon: CpuChipIcon },
+                { id: 'visual-comparison', label: 'Visual Comparison', icon: BeakerIcon }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setComparisonTab(tab.id)}
+                  className={`flex items-center space-x-2 px-6 py-4 border-b-2 transition-all duration-300 ${
+                    comparisonTab === tab.id
+                      ? 'border-blue-500 text-blue-600 bg-blue-50'
+                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                  }`}
+                >
+                  <tab.icon className="w-5 h-5" />
+                  <span className="font-medium whitespace-nowrap">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {comparisonTab === 'overview' && (
+            <SideBySideOverview responseA={responseA} responseB={responseB} />
+          )}
+          {comparisonTab === 'quality-metrics' && (
+            <QualityMetricsAnalysis responseA={responseA} responseB={responseB} />
+          )}
+          {comparisonTab === 'detailed-analysis' && (
+            <DetailedAnalysisBreakdown responseA={responseA} responseB={responseB} />
+          )}
+          {comparisonTab === 'visual-comparison' && (
+            <VisualComparisonCharts responseA={responseA} responseB={responseB} />
+          )}
+        </div>
+      </div>
+    );
+  };
+
+  // Side-by-Side Overview Component
+  const SideBySideOverview = ({ responseA, responseB }) => (
+    <div className="space-y-8">
+      {/* Quick Comparison Summary */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6">
+        <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Comparison Summary</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Winner Analysis */}
+          <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-6 border border-emerald-200">
+            <h3 className="text-lg font-bold text-emerald-800 mb-4">Quality Winner</h3>
+            {responseA.metrics.overall_quality > responseB.metrics.overall_quality ? (
+              <div>
+                <div className="text-3xl font-bold text-emerald-600 mb-2">{responseA.model}</div>
+                <div className="text-emerald-700">+{(responseA.metrics.overall_quality - responseB.metrics.overall_quality).toFixed(1)}% higher quality</div>
+              </div>
+            ) : responseB.metrics.overall_quality > responseA.metrics.overall_quality ? (
+              <div>
+                <div className="text-3xl font-bold text-emerald-600 mb-2">{responseB.model}</div>
+                <div className="text-emerald-700">+{(responseB.metrics.overall_quality - responseA.metrics.overall_quality).toFixed(1)}% higher quality</div>
+              </div>
+            ) : (
+              <div className="text-emerald-700 font-medium">Equal Quality Scores</div>
+            )}
+          </div>
+
+          {/* Performance Comparison */}
+          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+            <h3 className="text-lg font-bold text-blue-800 mb-4">Performance</h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-blue-700">Speed</span>
+                <span className="font-bold text-blue-600">
+                  {responseA.responseTime < responseB.responseTime ? responseA.model : responseB.model} faster
+                </span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-blue-700">Cost</span>
+                <span className="font-bold text-blue-600">
+                  {responseA.cost < responseB.cost ? responseA.model : responseB.model} cheaper
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Key Strengths */}
+          <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-200">
+            <h3 className="text-lg font-bold text-purple-800 mb-4">Key Strengths</h3>
+            <div className="space-y-2">
+              <div className="text-sm">
+                <span className="font-bold text-purple-600">{responseA.model}:</span> {getBestMetric(responseA)}
+              </div>
+              <div className="text-sm">
+                <span className="font-bold text-purple-600">{responseB.model}:</span> {getBestMetric(responseB)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Side-by-Side Response Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <ResponseComparisonCard response={responseA} position="A" otherResponse={responseB} />
+        <ResponseComparisonCard response={responseB} position="B" otherResponse={responseA} />
+      </div>
+    </div>
+  );
+
+  // Helper function to get best metric for a response
+  const getBestMetric = (response) => {
+    const metrics = {
+      'Coherence': response.metrics.coherence_score || response.metrics.accuracy_score || 0,
+      'Completeness': response.metrics.completeness_score || 0,
+      'Readability': response.metrics.readability_score || 0,
+      'Creativity': response.metrics.creativity_score || 0
+    };
+    
+    const bestMetric = Object.entries(metrics).reduce((a, b) => metrics[a[0]] > metrics[b[0]] ? a : b);
+    return `${bestMetric[0]} (${bestMetric[1]}%)`;
+  };
+
+  // Enhanced Response Comparison Card
+  const ResponseComparisonCard = ({ response, position, otherResponse }) => (
+    <div className="bg-white rounded-xl border border-gray-200 shadow-lg overflow-hidden">
+      {/* Header */}
+      <div className="bg-gradient-to-r from-blue-500 to-purple-500 text-white p-6">
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center font-bold text-lg">
+              {position}
+            </div>
+            <div>
+              <h3 className="text-xl font-bold">{response.model}</h3>
+              <p className="text-blue-100 text-sm">{response.timestamp}</p>
+            </div>
+          </div>
+          <div className="text-right">
+            <div className="text-2xl font-bold">{response.metrics.overall_quality}%</div>
+            <div className="text-blue-100 text-sm">Overall Quality</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Content */}
+      <div className="p-6">
+        <div className="mb-6">
+          <h4 className="text-lg font-bold text-gray-900 mb-3">Response Content</h4>
+          <div className="bg-gray-50 rounded-lg p-4 max-h-64 overflow-y-auto">
+            <p className="text-gray-700 leading-relaxed">{response.content}</p>
+          </div>
+        </div>
+
+        {/* Core Metrics */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          {[
+            { label: 'Coherence', value: response.metrics.coherence_score || response.metrics.accuracy_score || 0, color: 'blue' },
+            { label: 'Completeness', value: response.metrics.completeness_score || 0, color: 'green' },
+            { label: 'Readability', value: response.metrics.readability_score || 0, color: 'purple' },
+            { label: 'Creativity', value: response.metrics.creativity_score || 0, color: 'amber' }
+          ].map((metric) => (
+            <div key={metric.label} className="bg-white border border-gray-200 rounded-lg p-4">
+              <div className="text-sm text-gray-600 mb-1">{metric.label}</div>
+              <div className={`text-2xl font-bold text-${metric.color}-600`}>{metric.value}%</div>
+              <div className="w-full bg-gray-200 rounded-full h-2 mt-2">
+                <div
+                  className={`bg-${metric.color}-500 h-2 rounded-full transition-all duration-500`}
+                  style={{ width: `${metric.value}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Performance Metrics */}
+        <div className="border-t border-gray-200 pt-4">
+          <h4 className="text-sm font-bold text-gray-900 mb-3">Performance & Cost</h4>
+          <div className="grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="text-lg font-bold text-gray-900">{response.responseTime}s</div>
+              <div className="text-xs text-gray-600">Response Time</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-gray-900">${response.cost.toFixed(4)}</div>
+              <div className="text-xs text-gray-600">Cost</div>
+            </div>
+            <div>
+              <div className="text-lg font-bold text-gray-900">{response.tokenCount || 'N/A'}</div>
+              <div className="text-xs text-gray-600">Tokens</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Quality Metrics Analysis Component
+  const QualityMetricsAnalysis = ({ responseA, responseB }) => (
+    <div className="space-y-8">
+      {/* Comprehensive Metrics Comparison */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-8">Comprehensive Quality Metrics Analysis</h2>
+        
+        {/* All Quality Metrics Side by Side */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {[
+            { 
+              label: 'Coherence Score',
+              description: 'Logical flow and consistency',
+              valueA: responseA.metrics.coherence_score || responseA.metrics.accuracy_score || 0,
+              valueB: responseB.metrics.coherence_score || responseB.metrics.accuracy_score || 0,
+              color: 'blue',
+              icon: '🧠'
+            },
+            {
+              label: 'Completeness Score',
+              description: 'How thoroughly the response addresses the prompt',
+              valueA: responseA.metrics.completeness_score || 0,
+              valueB: responseB.metrics.completeness_score || 0,
+              color: 'green',
+              icon: '📝'
+            },
+            {
+              label: 'Readability Score',
+              description: 'Clarity and ease of understanding',
+              valueA: responseA.metrics.readability_score || 0,
+              valueB: responseB.metrics.readability_score || 0,
+              color: 'purple',
+              icon: '📖'
+            },
+            {
+              label: 'Creativity Score',
+              description: 'Originality and innovation in the response',
+              valueA: responseA.metrics.creativity_score || 0,
+              valueB: responseB.metrics.creativity_score || 0,
+              color: 'amber',
+              icon: '✨'
+            },
+            {
+              label: 'Technical Depth',
+              description: 'Level of technical accuracy and detail',
+              valueA: responseA.metrics.technical_depth || 0,
+              valueB: responseB.metrics.technical_depth || 0,
+              color: 'indigo',
+              icon: '⚙️'
+            },
+            {
+              label: 'Engagement Score',
+              description: 'How engaging and compelling the response is',
+              valueA: responseA.metrics.engagement_score || 0,
+              valueB: responseB.metrics.engagement_score || 0,
+              color: 'pink',
+              icon: '🎯'
+            }
+          ].map((metric) => (
+            <div key={metric.label} className="bg-gray-50 rounded-xl p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <span className="text-2xl">{metric.icon}</span>
+                <div>
+                  <h3 className="text-lg font-bold text-gray-900">{metric.label}</h3>
+                  <p className="text-sm text-gray-600">{metric.description}</p>
+                </div>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Response A */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-xs">A</div>
+                    <span className="font-medium text-gray-700">{responseA.model}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-24 bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`bg-${metric.color}-500 h-2 rounded-full transition-all duration-500`}
+                        style={{ width: `${metric.valueA}%` }}
+                      ></div>
+                    </div>
+                    <span className={`font-bold text-${metric.color}-600 w-12 text-right`}>{metric.valueA}%</span>
+                  </div>
+                </div>
+
+                {/* Response B */}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <div className="w-6 h-6 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-xs">B</div>
+                    <span className="font-medium text-gray-700">{responseB.model}</span>
+                  </div>
+                  <div className="flex items-center space-x-3">
+                    <div className="w-24 bg-gray-200 rounded-full h-2">
+                      <div
+                        className={`bg-${metric.color}-500 h-2 rounded-full transition-all duration-500`}
+                        style={{ width: `${metric.valueB}%` }}
+                      ></div>
+                    </div>
+                    <span className={`font-bold text-${metric.color}-600 w-12 text-right`}>{metric.valueB}%</span>
+                  </div>
+                </div>
+
+                {/* Difference */}
+                <div className="flex justify-center pt-2 border-t border-gray-200">
+                  <span className={`text-sm font-medium ${
+                    metric.valueA > metric.valueB ? 'text-blue-600' : 
+                    metric.valueB > metric.valueA ? 'text-purple-600' : 'text-gray-600'
+                  }`}>
+                    {metric.valueA === metric.valueB ? 'Equal scores' :
+                     metric.valueA > metric.valueB ? `${responseA.model} leads by ${(metric.valueA - metric.valueB).toFixed(1)}%` :
+                     `${responseB.model} leads by ${(metric.valueB - metric.valueA).toFixed(1)}%`}
+                  </span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Visual Quality Comparison Radar Chart */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Quality Metrics Radar Comparison</h3>
+        <div style={{ width: '100%', height: '400px' }}>
+          <ResponsiveContainer>
+            <RadarChart data={[
+              {
+                metric: 'Coherence',
+                [responseA.model]: responseA.metrics.coherence_score || responseA.metrics.accuracy_score || 0,
+                [responseB.model]: responseB.metrics.coherence_score || responseB.metrics.accuracy_score || 0
+              },
+              {
+                metric: 'Completeness',
+                [responseA.model]: responseA.metrics.completeness_score || 0,
+                [responseB.model]: responseB.metrics.completeness_score || 0
+              },
+              {
+                metric: 'Readability',
+                [responseA.model]: responseA.metrics.readability_score || 0,
+                [responseB.model]: responseB.metrics.readability_score || 0
+              },
+              {
+                metric: 'Creativity',
+                [responseA.model]: responseA.metrics.creativity_score || 0,
+                [responseB.model]: responseB.metrics.creativity_score || 0
+              },
+              {
+                metric: 'Technical',
+                [responseA.model]: responseA.metrics.technical_depth || 0,
+                [responseB.model]: responseB.metrics.technical_depth || 0
+              },
+              {
+                metric: 'Engagement',
+                [responseA.model]: responseA.metrics.engagement_score || 0,
+                [responseB.model]: responseB.metrics.engagement_score || 0
+              }
+            ]}>
+              <PolarGrid />
+              <PolarAngleAxis dataKey="metric" />
+              <PolarRadiusAxis angle={90} domain={[0, 100]} />
+              <Radar
+                name={responseA.model}
+                dataKey={responseA.model}
+                stroke="#3B82F6"
+                fill="#3B82F6"
+                fillOpacity={0.1}
+                strokeWidth={2}
+              />
+              <Radar
+                name={responseB.model}
+                dataKey={responseB.model}
+                stroke="#8B5CF6"
+                fill="#8B5CF6"
+                fillOpacity={0.1}
+                strokeWidth={2}
+              />
+              <Legend />
+            </RadarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Detailed Analysis Breakdown Component
+  const DetailedAnalysisBreakdown = ({ responseA, responseB }) => (
+    <div className="space-y-8">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h2 className="text-2xl font-bold text-gray-900 mb-8">Detailed Analysis Breakdown</h2>
+        
+        {/* Content Analysis */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="bg-blue-50 rounded-xl p-6 border border-blue-200">
+            <h3 className="text-xl font-bold text-blue-800 mb-4">{responseA.model} - Response A</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="text-sm font-medium text-blue-700 mb-2">Content Length</div>
+                <div className="text-2xl font-bold text-blue-600">{responseA.content.length} characters</div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-blue-700 mb-2">Word Count</div>
+                <div className="text-2xl font-bold text-blue-600">{responseA.content.split(' ').length} words</div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-blue-700 mb-2">Average Sentence Length</div>
+                <div className="text-2xl font-bold text-blue-600">
+                  {Math.round(responseA.content.split(' ').length / responseA.content.split('.').length)} words
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-purple-50 rounded-xl p-6 border border-purple-200">
+            <h3 className="text-xl font-bold text-purple-800 mb-4">{responseB.model} - Response B</h3>
+            <div className="space-y-4">
+              <div>
+                <div className="text-sm font-medium text-purple-700 mb-2">Content Length</div>
+                <div className="text-2xl font-bold text-purple-600">{responseB.content.length} characters</div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-purple-700 mb-2">Word Count</div>
+                <div className="text-2xl font-bold text-purple-600">{responseB.content.split(' ').length} words</div>
+              </div>
+              <div>
+                <div className="text-sm font-medium text-purple-700 mb-2">Average Sentence Length</div>
+                <div className="text-2xl font-bold text-purple-600">
+                  {Math.round(responseB.content.split(' ').length / responseB.content.split('.').length)} words
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Performance Comparison Chart */}
+        <div className="bg-gray-50 rounded-xl p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-6">Performance Metrics Comparison</h3>
+          <div style={{ width: '100%', height: '300px' }}>
+            <ResponsiveContainer>
+              <BarChart data={[
+                { metric: 'Response Time (s)', [responseA.model]: responseA.responseTime, [responseB.model]: responseB.responseTime },
+                { metric: 'Cost ($)', [responseA.model]: responseA.cost * 1000, [responseB.model]: responseB.cost * 1000 },
+                { metric: 'Overall Quality', [responseA.model]: responseA.metrics.overall_quality, [responseB.model]: responseB.metrics.overall_quality }
+              ]}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="metric" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Bar dataKey={responseA.model} fill="#3B82F6" />
+                <Bar dataKey={responseB.model} fill="#8B5CF6" />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Visual Comparison Charts Component
+  const VisualComparisonCharts = ({ responseA, responseB }) => (
+    <div className="space-y-8">
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8 text-center">
+        <BeakerIcon className="w-16 h-16 text-gray-300 mx-auto mb-6" />
+        <h2 className="text-2xl font-bold text-gray-900 mb-4">Advanced Visual Analytics</h2>
+        <p className="text-gray-600 mb-8">
+          Interactive charts, trend analysis, and advanced visualization tools for deeper insights.
+        </p>
+        <div className="text-blue-600 font-medium">Coming Soon...</div>
+      </div>
+    </div>
+  );
+
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
       {/* Enhanced Header */}
@@ -1286,10 +1836,8 @@ const ResponseComparison = () => {
                     onChange={(e) => setViewMode(e.target.value)}
                     className="px-4 py-3 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-white/50 text-gray-700 font-medium shadow-lg"
                   >
-                    <option value="all-responses">All Responses</option>
-                    <option value="search-and-select">Search & Select</option>
-                    <option value="detailed-comparison">Detailed Comparison</option>
-                    <option value="advanced-analysis">Advanced Analysis</option>
+                    <option value="search-and-select">🔍 Search & Select (2 Responses)</option>
+                    <option value="comparison-analysis">📊 Compare & Analyze</option>
                   </select>
                 </div>
                 <button className="flex items-center space-x-2 px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl hover:bg-white/30 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:scale-105">
@@ -1388,16 +1936,8 @@ const ResponseComparison = () => {
           </div>
         )}
 
-        {viewMode === 'detailed-comparison' && (
-          <DetailedComparisonView />
-        )}
-
-        {viewMode === 'all-responses' && (
-          <AllResponsesView />
-        )}
-
-        {viewMode === 'advanced-analysis' && (
-          <AdvancedAnalysisView />
+        {viewMode === 'comparison-analysis' && (
+          <ComparisonAnalysisView />
         )}
       </div>
     </div>
