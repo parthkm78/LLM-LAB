@@ -586,40 +586,9 @@ const QualityMetrics = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Quality Distribution */}
-          <div className="lg:col-span-1">
-            <QualityDistributionChart />
-          </div>
-
-          {/* Recent Analyses */}
-          <div className="lg:col-span-2">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Recent Analyses</h2>
-              <div className="flex items-center space-x-2">
-                <button className="flex items-center space-x-1.5 px-3 py-2 bg-white/80 backdrop-blur-sm border border-purple-200 text-purple-700 rounded-lg hover:bg-purple-50 transition-all duration-300 text-sm font-bold shadow-sm hover:shadow-md transform hover:scale-105">
-                  <FunnelIcon className="w-4 h-4" />
-                  <span>Filter</span>
-                </button>
-                <button className="flex items-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg transform hover:scale-105">
-                  <ChartPieIcon className="w-4 h-4" />
-                  <span>View Charts</span>
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-4">
-              {mockData.recentAnalyses.map((analysis) => (
-                <AnalysisRow key={analysis.id} analysis={analysis} />
-              ))}
-            </div>
-
-            <div className="mt-6 text-center">
-              <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:scale-105">
-                Load More Analyses
-              </button>
-            </div>
-          </div>
+        {/* Quality Distribution */}
+        <div>
+          <QualityDistributionChart />
         </div>
 
             {/* Enhanced Insights Section */}
@@ -653,6 +622,35 @@ const QualityMetrics = () => {
                 </div>
               </div>
             </div>
+
+        {/* Recent Analyses */}
+        <div>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Recent Analyses</h2>
+            <div className="flex items-center space-x-2">
+              <button className="flex items-center space-x-1.5 px-3 py-2 bg-white/80 backdrop-blur-sm border border-purple-200 text-purple-700 rounded-lg hover:bg-purple-50 transition-all duration-300 text-sm font-bold shadow-sm hover:shadow-md transform hover:scale-105">
+                <FunnelIcon className="w-4 h-4" />
+                <span>Filter</span>
+              </button>
+              <button className="flex items-center space-x-1.5 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg transform hover:scale-105">
+                <ChartPieIcon className="w-4 h-4" />
+                <span>View Charts</span>
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {mockData.recentAnalyses.map((analysis) => (
+              <AnalysisRow key={analysis.id} analysis={analysis} />
+            ))}
+          </div>
+
+          <div className="mt-6 text-center">
+            <button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:scale-105">
+              Load More Analyses
+            </button>
+          </div>
+        </div>
           </div>
         )}
 
