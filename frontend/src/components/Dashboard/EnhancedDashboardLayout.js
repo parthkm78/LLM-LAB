@@ -121,56 +121,23 @@ const EnhancedDashboardLayout = () => {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="bg-white border-b border-gray-200 px-4 py-4 lg:px-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              {/* Mobile menu button */}
-              <button
-                onClick={() => setMobileSidebarOpen(true)}
-                className="lg:hidden p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              >
-                <Bars3Icon className="h-6 w-6" />
-              </button>
+        {/* Mobile menu button - positioned as floating button */}
+        <button
+          onClick={() => setMobileSidebarOpen(true)}
+          className="lg:hidden fixed top-4 left-4 z-30 p-2 rounded-lg bg-white shadow-lg border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+        >
+          <Bars3Icon className="h-5 w-5" />
+        </button>
 
-              {/* Desktop sidebar toggle */}
-              <button
-                onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-                className="hidden lg:block p-2 rounded-md text-gray-600 hover:text-gray-900 hover:bg-gray-100"
-              >
-                <Bars3Icon className="h-5 w-5" />
-              </button>
+        {/* Desktop sidebar toggle - positioned as floating button */}
+        <button
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="hidden lg:block fixed top-4 left-4 z-30 p-2 rounded-lg bg-white shadow-lg border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+        >
+          <Bars3Icon className="h-4 w-4" />
+        </button>
 
-              {/* Page Title */}
-              <div>
-                <h1 className="text-2xl font-bold text-gray-900">{getSectionTitle()}</h1>
-                <p className="text-sm text-gray-500 mt-1">
-                  {activeSection === 'overview' && 'Complete overview of your LLM analysis activities'}
-                  {activeSection === 'parameters' && 'Configure and test LLM parameters for optimal responses'}
-                  {activeSection === 'quality' && 'Comprehensive quality analysis and metrics'}
-                  {activeSection === 'comparison' && 'Compare multiple responses side by side'}
-                  {activeSection === 'batch' && 'Run batch experiments with multiple parameter combinations'}
-                  {activeSection === 'analytics' && 'Advanced analytics, trends, and insights'}
-                </p>
-              </div>
-            </div>
-
-            {/* Header Actions */}
-            <div className="flex items-center space-x-3">
-              <div className="hidden sm:flex items-center space-x-2">
-                <div className="flex items-center space-x-2 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-sm font-medium rounded-lg">
-                  <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
-                  <span>System Healthy</span>
-                </div>
-                <button className="px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 transition-colors">
-                  New Experiment
-                </button>
-              </div>
-            </div>
-          </div>
-        </header>
-
-        {/* Main Content Area */}
+        {/* Main Content Area - Full Height */}
         <main className="flex-1 overflow-auto bg-gray-50">
           <div className="h-full">
             {renderActiveSection()}

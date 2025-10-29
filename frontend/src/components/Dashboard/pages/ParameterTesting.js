@@ -12,8 +12,14 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { designTokens, getParameterColor } from '../../../styles/designTokens';
+import { useExperiments, useQualityMetrics } from '../../../hooks/useExperiments';
+import { useNotifications } from '../../../contexts/NotificationContext';
 
 const ParameterTesting = () => {
+  const { createExperiment, generateResponses, loading: experimentsLoading } = useExperiments();
+  const { calculateMetrics, loading: metricsLoading } = useQualityMetrics();
+  const { success, error: showError } = useNotifications();
+  
   const [currentParameters, setCurrentParameters] = useState({
     temperature: 0.7,
     top_p: 0.9,
@@ -24,9 +30,11 @@ const ParameterTesting = () => {
   });
 
   const [activePreset, setActivePreset] = useState('balanced');
-  const [testPrompt, setTestPrompt] = useState('');
+  const [testPrompt, setTestPrompt] = useState('Write a short story about a robot discovering friendship.');
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedResponse, setGeneratedResponse] = useState('');
+  const [responseMetrics, setResponseMetrics] = useState(null);
+  const [lastExperiment, setLastExperiment] = useState(null);
 
   const parameterPresets = [
     {
@@ -141,14 +149,52 @@ const ParameterTesting = () => {
   };
 
   const generateResponse = async () => {
-    if (!testPrompt.trim()) return;
+    if (!testPrompt.trim()) {
+      showError('Please enter a prompt to test');
+      return;
+    }
     
     setIsGenerating(true);
-    // Simulate API call
-    setTimeout(() => {
-      setGeneratedResponse(`This is a simulated response generated with the current parameters. Temperature: ${currentParameters.temperature}, Top-p: ${currentParameters.top_p}, Max tokens: ${currentParameters.max_tokens}.`);
+    setGeneratedResponse('');
+    setResponseMetrics(null);
+    
+    try {
+      // Create a new experiment
+      const experiment = await createExperiment({
+        name: `Parameter Test - ${new Date().toLocaleTimeString()}`,
+        prompt: testPrompt,
+        parameters: currentParameters,
+        type: 'single'
+      });
+      
+      setLastExperiment(experiment);
+      
+      // Generate response
+      const response = await generateResponses(experiment.id, {
+        model: currentParameters.model,
+        parameters: currentParameters
+      });
+      
+      if (response.content) {
+        setGeneratedResponse(response.content);
+        success('Response generated successfully!');
+        
+        // Calculate quality metrics
+        try {
+          const metrics = await calculateMetrics(response.id);
+          setResponseMetrics(metrics);
+        } catch (metricsError) {
+          console.warn('Failed to calculate metrics:', metricsError);
+          // Continue without metrics - this is not critical
+        }
+      }
+      
+    } catch (err) {
+      showError(err.message || 'Failed to generate response');
+      console.error('Generate response error:', err);
+    } finally {
       setIsGenerating(false);
-    }, 2000);
+    }
   };
 
   const ParameterSlider = ({ paramKey, parameter }) => (
@@ -302,10 +348,10 @@ const ParameterTesting = () => {
             />
             <button
               onClick={generateResponse}
-              disabled={!testPrompt.trim() || isGenerating}
+              disabled={!testPrompt.trim() || isGenerating || experimentsLoading}
               className="w-full mt-4 flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
-              {isGenerating ? (
+              {(isGenerating || experimentsLoading) ? (
                 <>
                   <ArrowPathIcon className="w-5 h-5 animate-spin" />
                   <span>Generating...</span>
@@ -323,15 +369,67 @@ const ParameterTesting = () => {
           {generatedResponse && (
             <div className="bg-white rounded-xl border border-gray-200 p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Generated Response</h3>
-              <div className="bg-gray-50 rounded-lg p-4 text-gray-700">
+              <div className="bg-gray-50 rounded-lg p-4 text-gray-700 mb-4">
                 {generatedResponse}
               </div>
-              <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                <button className="flex items-center space-x-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors">
+              
+              {/* Quality Metrics */}
+              {responseMetrics && (
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-blue-50 rounded-lg">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">
+                      {responseMetrics.quality || 'N/A'}%
+                    </div>
+                    <div className="text-xs text-gray-600">Overall Quality</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">
+                      {responseMetrics.creativity || 'N/A'}%
+                    </div>
+                    <div className="text-xs text-gray-600">Creativity</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-emerald-600">
+                      {responseMetrics.coherence || 'N/A'}%
+                    </div>
+                    <div className="text-xs text-gray-600">Coherence</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-amber-600">
+                      {responseMetrics.readability || 'N/A'}%
+                    </div>
+                    <div className="text-xs text-gray-600">Readability</div>
+                  </div>
+                </div>
+              )}
+              
+              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                <button 
+                  onClick={async () => {
+                    if (lastExperiment && !responseMetrics) {
+                      try {
+                        const metrics = await calculateMetrics(lastExperiment.id);
+                        setResponseMetrics(metrics);
+                        success('Quality metrics calculated!');
+                      } catch (err) {
+                        showError('Failed to calculate quality metrics');
+                      }
+                    }
+                  }}
+                  disabled={metricsLoading || !!responseMetrics}
+                  className="flex items-center space-x-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors disabled:opacity-50"
+                >
                   <ChartBarIcon className="w-4 h-4" />
-                  <span>Analyze Quality</span>
+                  <span>{responseMetrics ? 'Quality Analyzed' : 'Analyze Quality'}</span>
                 </button>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors">
+                <button 
+                  onClick={() => {
+                    if (lastExperiment) {
+                      success('Experiment saved to history!');
+                    }
+                  }}
+                  className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
+                >
                   <DocumentTextIcon className="w-4 h-4" />
                   <span>Save Result</span>
                 </button>

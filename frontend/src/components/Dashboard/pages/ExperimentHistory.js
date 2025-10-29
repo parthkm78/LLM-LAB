@@ -408,18 +408,18 @@ const ExperimentHistory = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Experiment History</h1>
-            <p className="text-gray-600 mt-1">Manage and analyze your LLM experiments</p>
+            <h1 className="text-lg font-bold text-gray-900">Experiment History</h1>
+            <p className="text-gray-600 text-sm">Manage and analyze your LLM experiments</p>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             <select
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             >
               <option value="list">List View</option>
               <option value="grid">Grid View</option>
@@ -429,10 +429,10 @@ const ExperimentHistory = () => {
         </div>
       </div>
 
-      <div className="p-6">
+      <div className="p-4">
         {/* Controls */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-white rounded-lg border border-gray-200 p-4 mb-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
             {/* Search */}
             <div className="relative">
               <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />

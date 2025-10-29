@@ -521,20 +521,20 @@ For the first time in her existence, ARIA understood that she was not just proce
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <button
               onClick={onBack}
-              className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors text-sm"
             >
               <ArrowLeftIcon className="w-4 h-4" />
-              <span>Back to Dashboard</span>
+              <span>Back</span>
             </button>
-            <div className="w-px h-6 bg-gray-300"></div>
+            <div className="w-px h-5 bg-gray-300"></div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{experimentData.name}</h1>
-              <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+              <h1 className="text-lg font-bold text-gray-900">{experimentData.name}</h1>
+              <div className="flex items-center space-x-3 text-sm text-gray-600">
                 <span>Model: {experimentData.model}</span>
                 <span>•</span>
                 <span>Quality: {experimentData.metrics.overall_quality}%</span>
@@ -544,8 +544,8 @@ For the first time in her existence, ARIA understood that she was not just proce
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+          <div className="flex items-center space-x-2">
+            <button className="flex items-center space-x-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-sm">
               <HeartIcon className="w-4 h-4" />
               <span>Save</span>
             </button>
@@ -581,7 +581,7 @@ For the first time in her existence, ARIA understood that she was not just proce
       </div>
 
       {/* Main Content */}
-      <div className="p-6">
+      <div className="p-4">
         {renderTabContent()}
       </div>
     </div>

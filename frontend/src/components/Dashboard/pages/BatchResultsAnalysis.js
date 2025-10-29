@@ -125,19 +125,19 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
   });
 
   const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = 'blue' }) => (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300">
+    <div className="bg-white rounded-lg border border-gray-200 p-4 hover:shadow-lg transition-all duration-300">
       <div className="flex items-center justify-between">
         <div>
           <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
-          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+          <p className="text-2xl font-bold text-gray-900 mt-1">{value}</p>
+          {subtitle && <p className="text-sm text-gray-500 mt-0.5">{subtitle}</p>}
         </div>
-        <div className={`w-14 h-14 bg-gradient-to-br from-${color}-500 to-${color}-600 rounded-xl flex items-center justify-center`}>
-          <Icon className="w-7 h-7 text-white" />
+        <div className={`w-12 h-12 bg-gradient-to-br from-${color}-500 to-${color}-600 rounded-lg flex items-center justify-center`}>
+          <Icon className="w-6 h-6 text-white" />
         </div>
       </div>
       {trend && (
-        <div className="flex items-center mt-4 pt-4 border-t border-gray-100">
+        <div className="flex items-center mt-3 pt-3 border-t border-gray-100">
           {trend > 0 ? (
             <ArrowTrendingUpIcon className="w-4 h-4 text-emerald-500 mr-1" />
           ) : (
@@ -152,31 +152,31 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
   );
 
   const ResultCard = ({ result, rank }) => (
-    <div className={`bg-white rounded-xl border-2 transition-all duration-300 hover:shadow-lg ${
+    <div className={`bg-white rounded-lg border-2 transition-all duration-300 hover:shadow-lg ${
       rank <= 3 ? 'border-yellow-300 bg-gradient-to-br from-yellow-50 to-amber-50' : 'border-gray-200 hover:border-blue-300'
     }`}>
-      <div className="p-6">
+      <div className="p-4">
         {/* Header */}
-        <div className="flex items-start justify-between mb-4">
-          <div className="flex items-center space-x-3">
+        <div className="flex items-start justify-between mb-3">
+          <div className="flex items-center space-x-2">
             {rank <= 3 && (
-              <div className={`w-8 h-8 rounded-full flex items-center justify-center ${
+              <div className={`w-6 h-6 rounded-full flex items-center justify-center ${
                 rank === 1 ? 'bg-yellow-500' : rank === 2 ? 'bg-gray-400' : 'bg-amber-600'
               }`}>
-                <span className="text-white font-bold text-sm">#{rank}</span>
+                <span className="text-white font-bold text-xs">#{rank}</span>
               </div>
             )}
             <div>
-              <h3 className="font-semibold text-gray-900">
+              <h3 className="font-semibold text-gray-900 text-sm">
                 Combination {result.id}
               </h3>
-              <div className="text-sm text-gray-600">
+              <div className="text-xs text-gray-600">
                 T:{result.temperature} • P:{result.top_p} • Tokens:{result.max_tokens}
               </div>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-2xl font-bold" style={{ color: getQualityColor(result.quality) }}>
+            <div className="text-xl font-bold" style={{ color: getQualityColor(result.quality) }}>
               {result.quality}%
             </div>
             <div className="text-xs text-gray-500">Quality</div>
@@ -184,21 +184,21 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
         </div>
 
         {/* Metrics */}
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-2 mb-3">
           <div className="text-center">
-            <div className="text-lg font-bold" style={{ color: getQualityColor(result.creativity) }}>
+            <div className="text-base font-bold" style={{ color: getQualityColor(result.creativity) }}>
               {Math.round(result.creativity)}%
             </div>
             <div className="text-xs text-gray-500">Creativity</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold" style={{ color: getQualityColor(result.coherence) }}>
+            <div className="text-base font-bold" style={{ color: getQualityColor(result.coherence) }}>
               {Math.round(result.coherence)}%
             </div>
             <div className="text-xs text-gray-500">Coherence</div>
           </div>
           <div className="text-center">
-            <div className="text-lg font-bold text-purple-600">
+            <div className="text-base font-bold text-purple-600">
               ${result.cost.toFixed(4)}
             </div>
             <div className="text-xs text-gray-500">Cost</div>
@@ -206,7 +206,7 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
         </div>
 
         {/* Progress bars */}
-        <div className="space-y-2 mb-4">
+        <div className="space-y-1.5 mb-3">
           <div className="flex items-center justify-between text-xs">
             <span>Quality</span>
             <span>{result.quality}%</span>
@@ -223,13 +223,13 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
         </div>
 
         {/* Actions */}
-        <div className="flex items-center space-x-2">
-          <button className="flex-1 flex items-center justify-center space-x-1 px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-sm">
-            <EyeIcon className="w-4 h-4" />
-            <span>View Details</span>
+        <div className="flex items-center space-x-1">
+          <button className="flex-1 flex items-center justify-center space-x-1 px-2 py-1.5 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors text-xs">
+            <EyeIcon className="w-3 h-3" />
+            <span>View</span>
           </button>
-          <button className="flex items-center justify-center px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-            <DocumentTextIcon className="w-4 h-4" />
+          <button className="flex items-center justify-center px-2 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
+            <DocumentTextIcon className="w-3 h-3" />
           </button>
         </div>
       </div>
@@ -294,20 +294,20 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4">
+      <div className="bg-white border-b border-gray-200 px-4 py-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-3">
             <button
               onClick={onBack}
-              className="flex items-center space-x-2 px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
+              className="flex items-center space-x-2 px-3 py-1.5 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors text-sm"
             >
               <ArrowLeftIcon className="w-4 h-4" />
-              <span>Back to Batch Experiments</span>
+              <span>Back</span>
             </button>
-            <div className="w-px h-6 bg-gray-300"></div>
+            <div className="w-px h-5 bg-gray-300"></div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-900">{batchData.name}</h1>
-              <div className="flex items-center space-x-4 text-sm text-gray-600 mt-1">
+              <h1 className="text-lg font-bold text-gray-900">{batchData.name}</h1>
+              <div className="flex items-center space-x-3 text-sm text-gray-600">
                 <span>Model: {batchData.model}</span>
                 <span>•</span>
                 <span>{batchData.completedCombinations} combinations</span>
@@ -319,25 +319,25 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
             </div>
           </div>
 
-          <div className="flex items-center space-x-3">
+          <div className="flex items-center space-x-2">
             <select
               value={viewMode}
               onChange={(e) => setViewMode(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+              className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-sm"
             >
               <option value="grid">Grid View</option>
               <option value="chart">Chart View</option>
               <option value="heatmap">Heatmap View</option>
             </select>
-            <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <button className="flex items-center space-x-1 px-3 py-1.5 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
               <ArrowDownTrayIcon className="w-4 h-4" />
-              <span>Export Results</span>
+              <span>Export</span>
             </button>
           </div>
         </div>
       </div>
 
-      <div className="p-6 space-y-8">
+      <div className="p-4 space-y-4">
         {/* Summary Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <StatCard
