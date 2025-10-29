@@ -154,22 +154,20 @@ class LLMService {
       temperature = 0.7,
       top_p = 1.0,
       max_tokens = 150,
-      model = 'gemini-1.5-flash' // Default to free tier model
+      model = 'gemini-2.5-pro-free' // Default to Gemini 2.5 Pro Free tier model
     } = parameters;
 
     const startTime = Date.now();
 
-    // Map model names to proper Google AI model names
+    // Ensure we have the correct model path format for Google AI Studio
     let actualModel = model;
-    const modelMapping = {
-      'gemini-pro': 'gemini-1.5-flash', // Fallback legacy to new free model
-      'gemini-1.5-flash': 'gemini-1.5-flash',
-      'gemini-1.5-pro': 'gemini-1.5-pro',
-      'text-bison-001': 'text-bison-001'
-    };
     
-    if (modelMapping[model]) {
-      actualModel = modelMapping[model];
+    // Handle different model naming conventions for Google AI Studio free tier
+    if (model === 'gemini-2.5-pro-free') {
+      // Try different possible endpoints for Gemini 2.5 Pro Free
+      actualModel = 'gemini-2.5-pro-free';
+    } else if (!model.startsWith('models/') && !model.includes('gemini-2.0') && !model.includes('gemini-1.5')) {
+      actualModel = `models/${model}`;
     }
 
     console.log(`🤖 Using Google AI model: ${actualModel}`);

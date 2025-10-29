@@ -83,10 +83,14 @@ router.get('/models', async (req, res) => {
       ];
     } else if (provider === 'google') {
       models = [
+        { id: 'gemini-2.0-flash-exp', name: 'Gemini 2.0 Flash (Experimental)', description: 'Latest experimental model - Free tier' },
         { id: 'gemini-1.5-flash', name: 'Gemini 1.5 Flash', description: 'Fast and efficient model - Free tier' },
-        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', description: 'Most capable model - Limited free usage' },
-        { id: 'gemini-pro', name: 'Gemini Pro (Legacy)', description: 'Legacy model - may not be available' },
-        { id: 'text-bison-001', name: 'Text Bison', description: 'Legacy text generation model' }
+        { id: 'gemini-1.5-pro', name: 'Gemini 1.5 Pro', description: 'Most capable model - Free tier with limits' },
+        { id: 'gemini-pro', name: 'Gemini Pro', description: 'Standard model - Free tier available' },
+        { id: 'models/gemini-pro', name: 'Gemini Pro (Full Path)', description: 'Gemini Pro with full model path - Free tier' },
+        { id: 'models/text-bison-001', name: 'Text Bison', description: 'Legacy text model - Free tier' },
+        { id: 'gemini-2.5-pro-free', name: 'Gemini 2.5 Pro Free', description: 'Gemini 2.5 Pro Free Model - Full functionality with rate limits' },
+        { id: 'models/gemini-2.5-pro-free', name: 'Gemini 2.5 Pro Free (Full Path)', description: 'Gemini 2.5 Pro Free with full model path' }
       ];
     }
 
