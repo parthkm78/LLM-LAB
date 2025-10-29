@@ -6,252 +6,354 @@ import {
   CpuChipIcon,
   ClockIcon,
   ArrowTrendingUpIcon,
+  ArrowTrendingDownIcon,
   SparklesIcon,
   ArrowRightIcon,
   PlayIcon,
-  PlusIcon
+  PlusIcon,
+  ChartPieIcon,
+  TrophyIcon,
+  BoltIcon,
+  FireIcon
 } from '@heroicons/react/24/outline';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { designTokens, getQualityColor } from '../../../styles/designTokens';
 
 const DashboardOverview = ({ section = 'overview' }) => {
+  // Enhanced stats with more metrics
   const [quickStats] = useState({
-    totalExperiments: 247,
-    avgQualityScore: 87,
-    topPerformingModel: 'GPT-4',
-    experimentsToday: 12,
-    responseAnalyzed: 1540,
-    avgResponseTime: '2.3s'
+    totalExperiments: 1247,
+    avgQualityScore: 87.3,
+    experimentsToday: 23,
+    responseAnalyzed: 5640,
+    avgResponseTime: 1.8,
+    topModel: 'GPT-4',
+    successRate: 94.2,
+    totalCost: 45.67,
+    activeModels: 5,
+    bestQuality: 96.8,
+    improvementRate: 12.5,
+    avgTokens: 420
   });
 
-  const [recentExperiments] = useState([
-    {
-      id: 1,
-      name: 'Creative Writing Analysis',
-      model: 'GPT-4',
-      parameters: { temperature: 0.8, top_p: 0.9 },
-      qualityScore: 91,
-      timestamp: '2 hours ago',
-      status: 'completed'
-    },
-    {
-      id: 2,
-      name: 'Technical Documentation',
-      model: 'Claude-3',
-      parameters: { temperature: 0.3, top_p: 0.8 },
-      qualityScore: 89,
-      timestamp: '4 hours ago',
-      status: 'completed'
-    },
-    {
-      id: 3,
-      name: 'Code Generation Test',
-      model: 'GPT-4',
-      parameters: { temperature: 0.2, top_p: 0.7 },
-      qualityScore: 93,
-      timestamp: '6 hours ago',
-      status: 'completed'
-    }
+  // Chart data for trends
+  const [qualityTrend] = useState([
+    { day: 'Mon', quality: 82, experiments: 45 },
+    { day: 'Tue', quality: 85, experiments: 52 },
+    { day: 'Wed', quality: 87, experiments: 48 },
+    { day: 'Thu', quality: 89, experiments: 61 },
+    { day: 'Fri', quality: 91, experiments: 58 },
+    { day: 'Sat', quality: 88, experiments: 35 },
+    { day: 'Sun', quality: 87, experiments: 41 }
   ]);
 
-  const StatCard = ({ title, value, subtitle, icon: Icon, trend, color = 'blue' }) => (
-    <div className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-300">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium text-gray-600">{title}</p>
-          <p className="text-3xl font-bold text-gray-900 mt-2">{value}</p>
-          {subtitle && <p className="text-sm text-gray-500 mt-1">{subtitle}</p>}
+  const [modelDistribution] = useState([
+    { name: 'GPT-4', value: 45, color: '#3b82f6' },
+    { name: 'Claude-3', value: 25, color: '#8b5cf6' },
+    { name: 'GPT-3.5', value: 20, color: '#10b981' },
+    { name: 'Gemini', value: 10, color: '#f59e0b' }
+  ]);
+
+  const [recentActivity] = useState([
+    { time: '2m ago', action: 'Batch experiment completed', quality: 94, type: 'success' },
+    { time: '5m ago', action: 'Parameter optimization started', quality: null, type: 'info' },
+    { time: '12m ago', action: 'Quality analysis finished', quality: 89, type: 'success' },
+    { time: '18m ago', action: 'New experiment created', quality: null, type: 'info' },
+    { time: '25m ago', action: 'Response comparison completed', quality: 92, type: 'success' }
+  ]);
+
+  // Compact stat card component
+  const CompactStatCard = ({ title, value, subtitle, icon: Icon, trend, trendValue, color = 'blue', size = 'normal' }) => (
+    <div className="bg-white rounded-lg border border-gray-200 p-3 hover:shadow-md transition-all duration-200">
+      <div className="flex items-center justify-between mb-2">
+        <div className={`w-8 h-8 bg-gradient-to-br from-${color}-500 to-${color}-600 rounded-lg flex items-center justify-center`}>
+          <Icon className="w-4 h-4 text-white" />
         </div>
-        <div className={`w-14 h-14 bg-gradient-to-br from-${color}-500 to-${color}-600 rounded-xl flex items-center justify-center`}>
-          <Icon className="w-7 h-7 text-white" />
-        </div>
+        {trend && (
+          <div className={`flex items-center ${trend === 'up' ? 'text-emerald-600' : 'text-red-600'}`}>
+            {trend === 'up' ? (
+              <ArrowTrendingUpIcon className="w-3 h-3 mr-1" />
+            ) : (
+              <ArrowTrendingDownIcon className="w-3 h-3 mr-1" />
+            )}
+            <span className="text-xs font-medium">{trendValue}</span>
+          </div>
+        )}
       </div>
-      {trend && (
-        <div className="flex items-center mt-4 pt-4 border-t border-gray-100">
-          <ArrowTrendingUpIcon className="w-4 h-4 text-emerald-500 mr-1" />
-          <span className="text-sm text-emerald-600 font-medium">{trend}</span>
+      <div>
+        <p className="text-xs font-medium text-gray-600 mb-1">{title}</p>
+        <p className={`font-bold text-gray-900 ${size === 'large' ? 'text-2xl' : 'text-xl'}`}>{value}</p>
+        {subtitle && <p className="text-xs text-gray-500 mt-1">{subtitle}</p>}
+      </div>
+    </div>
+  );
+
+  // Activity item component
+  const ActivityItem = ({ activity }) => (
+    <div className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg transition-colors">
+      <div className={`w-2 h-2 rounded-full ${
+        activity.type === 'success' ? 'bg-emerald-500' : 
+        activity.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+      }`}></div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm text-gray-900 truncate">{activity.action}</p>
+        <p className="text-xs text-gray-500">{activity.time}</p>
+      </div>
+      {activity.quality && (
+        <div className="text-right">
+          <span className="text-sm font-medium" style={{ color: getQualityColor(activity.quality) }}>
+            {activity.quality}%
+          </span>
         </div>
       )}
     </div>
   );
 
-  const QuickActionCard = ({ title, description, icon: Icon, color, onClick }) => (
-    <button
-      onClick={onClick}
-      className="w-full bg-white rounded-xl border border-gray-200 p-6 hover:shadow-lg hover:border-blue-300 transition-all duration-300 text-left group"
-    >
-      <div className="flex items-start space-x-4">
-        <div className={`w-12 h-12 bg-gradient-to-br ${color} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
-          <Icon className="w-6 h-6 text-white" />
-        </div>
-        <div className="flex-1">
-          <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 transition-colors">
-            {title}
-          </h3>
-          <p className="text-gray-600 mt-1">{description}</p>
-          <div className="flex items-center mt-3 text-blue-600 font-medium">
-            <span className="text-sm">Get Started</span>
-            <ArrowRightIcon className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
-          </div>
-        </div>
-      </div>
-    </button>
-  );
-
   if (section === 'recent') {
     return (
-      <div className="p-6 space-y-6">
+      <div className="p-4 space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-bold text-gray-900">Recent Activity</h2>
-          <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            View All Experiments
+          <h2 className="text-xl font-bold text-gray-900">Recent Activity</h2>
+          <button className="px-3 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm">
+            View All
           </button>
         </div>
 
-        <div className="space-y-4">
-          {recentExperiments.map((experiment) => (
-            <div key={experiment.id} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <div className="flex-1">
-                  <div className="flex items-center space-x-3">
-                    <h3 className="text-lg font-semibold text-gray-900">{experiment.name}</h3>
-                    <span className="px-2 py-1 bg-emerald-100 text-emerald-700 text-xs font-medium rounded-full">
-                      {experiment.status}
-                    </span>
-                  </div>
-                  <div className="flex items-center space-x-4 mt-2 text-sm text-gray-600">
-                    <span>Model: {experiment.model}</span>
-                    <span>•</span>
-                    <span>Temp: {experiment.parameters.temperature}</span>
-                    <span>•</span>
-                    <span>Top-p: {experiment.parameters.top_p}</span>
-                    <span>•</span>
-                    <span>{experiment.timestamp}</span>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold" style={{ color: getQualityColor(experiment.qualityScore) }}>
-                    {experiment.qualityScore}%
-                  </div>
-                  <div className="text-sm text-gray-500">Quality Score</div>
-                </div>
-              </div>
-            </div>
-          ))}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <div className="space-y-1">
+            {recentActivity.map((activity, index) => (
+              <ActivityItem key={index} activity={activity} />
+            ))}
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="p-6 space-y-8">
-      {/* Welcome Section */}
-      <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl p-8 border border-blue-100">
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">
-              Welcome to LLM Analyzer
-            </h1>
-            <p className="text-lg text-gray-600 mb-4">
-              Your intelligent platform for LLM parameter optimization and quality analysis
-            </p>
-            <div className="flex items-center space-x-4">
-              <button className="flex items-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors">
-                <PlayIcon className="w-5 h-5" />
-                <span>Start New Experiment</span>
-              </button>
-              <button className="flex items-center space-x-2 px-6 py-3 bg-white text-blue-600 border border-blue-200 rounded-xl hover:bg-blue-50 transition-colors">
-                <SparklesIcon className="w-5 h-5" />
-                <span>View Tutorial</span>
-              </button>
+    <div className="p-4 space-y-4 max-w-full overflow-hidden">
+      {/* Header Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <CompactStatCard
+          title="Total Experiments"
+          value={quickStats.totalExperiments.toLocaleString()}
+          icon={BeakerIcon}
+          trend="up"
+          trendValue="+8.2%"
+          color="blue"
+          size="large"
+        />
+        <CompactStatCard
+          title="Avg Quality"
+          value={`${quickStats.avgQualityScore}%`}
+          icon={TrophyIcon}
+          trend="up"
+          trendValue="+2.1%"
+          color="emerald"
+          size="large"
+        />
+        <CompactStatCard
+          title="Today"
+          value={quickStats.experimentsToday}
+          subtitle="experiments"
+          icon={ClockIcon}
+          trend="up"
+          trendValue="+15%"
+          color="purple"
+        />
+        <CompactStatCard
+          title="Success Rate"
+          value={`${quickStats.successRate}%`}
+          icon={SparklesIcon}
+          trend="up"
+          trendValue="+1.8%"
+          color="indigo"
+        />
+        <CompactStatCard
+          title="Responses"
+          value={quickStats.responseAnalyzed.toLocaleString()}
+          subtitle="analyzed"
+          icon={DocumentTextIcon}
+          color="orange"
+        />
+        <CompactStatCard
+          title="Avg Time"
+          value={`${quickStats.avgResponseTime}s`}
+          icon={BoltIcon}
+          trend="down"
+          trendValue="-0.3s"
+          color="cyan"
+        />
+      </div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Quality Trend Chart */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Quality Trends</h3>
+            <div className="flex items-center space-x-4 text-sm">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-500 rounded mr-2"></div>
+                <span className="text-gray-600">Quality Score</span>
+              </div>
             </div>
           </div>
-          <div className="hidden lg:block">
-            <div className="w-32 h-32 bg-gradient-to-br from-blue-400 to-purple-500 rounded-3xl flex items-center justify-center">
-              <CpuChipIcon className="w-16 h-16 text-white" />
-            </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={qualityTrend}>
+              <defs>
+                <linearGradient id="qualityGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3}/>
+                  <stop offset="95%" stopColor="#3b82f6" stopOpacity={0.1}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
+              <XAxis dataKey="day" stroke="#64748b" fontSize={12} />
+              <YAxis stroke="#64748b" fontSize={12} />
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '12px'
+                }}
+                labelStyle={{ color: '#374151' }}
+                itemStyle={{ color: '#3b82f6' }}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="quality" 
+                stroke="#3b82f6" 
+                strokeWidth={2}
+                fill="url(#qualityGradient)" 
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+
+        {/* Model Distribution */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Model Usage</h3>
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie
+                data={modelDistribution}
+                cx="50%"
+                cy="50%"
+                innerRadius={40}
+                outerRadius={80}
+                paddingAngle={2}
+                dataKey="value"
+              >
+                {modelDistribution.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.color} />
+                ))}
+              </Pie>
+              <Tooltip 
+                contentStyle={{ 
+                  backgroundColor: 'white', 
+                  border: '1px solid #e2e8f0',
+                  borderRadius: '8px',
+                  fontSize: '12px'
+                }}
+                labelStyle={{ color: '#374151' }}
+                itemStyle={{ color: '#6b7280' }}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+          <div className="grid grid-cols-2 gap-2 mt-4">
+            {modelDistribution.map((model, index) => (
+              <div key={index} className="flex items-center space-x-2">
+                <div 
+                  className="w-3 h-3 rounded" 
+                  style={{ backgroundColor: model.color }}
+                ></div>
+                <span className="text-xs text-gray-600">{model.name}</span>
+                <span className="text-xs font-medium text-gray-900">{model.value}%</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
 
-      {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatCard
-          title="Total Experiments"
-          value={quickStats.totalExperiments}
-          subtitle="This month"
-          icon={BeakerIcon}
-          trend="+12% from last month"
-          color="blue"
-        />
-        <StatCard
-          title="Avg Quality Score"
-          value={`${quickStats.avgQualityScore}%`}
-          subtitle="Across all experiments"
-          icon={ChartBarIcon}
-          trend="+5.2% improvement"
-          color="emerald"
-        />
-        <StatCard
-          title="Responses Analyzed"
-          value={quickStats.responseAnalyzed}
-          subtitle="Total processed"
-          icon={DocumentTextIcon}
-          trend="+18% this week"
-          color="purple"
-        />
+      {/* Bottom Stats and Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        {/* Additional Metrics */}
+        <div className="bg-white rounded-xl border border-gray-200 p-4">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Performance Metrics</h3>
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Best Quality Score</span>
+              <span className="text-sm font-medium text-emerald-600">{quickStats.bestQuality}%</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Improvement Rate</span>
+              <span className="text-sm font-medium text-blue-600">+{quickStats.improvementRate}%</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Total Cost</span>
+              <span className="text-sm font-medium text-purple-600">${quickStats.totalCost}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Active Models</span>
+              <span className="text-sm font-medium text-orange-600">{quickStats.activeModels}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-sm text-gray-600">Avg Tokens</span>
+              <span className="text-sm font-medium text-cyan-600">{quickStats.avgTokens}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Activity */}
+        <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+            <button className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+              View All
+            </button>
+          </div>
+          <div className="space-y-1">
+            {recentActivity.slice(0, 6).map((activity, index) => (
+              <ActivityItem key={index} activity={activity} />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Quick Actions */}
-      <div>
-        <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <QuickActionCard
-            title="Parameter Testing"
-            description="Configure and test different LLM parameters for optimal results"
-            icon={BeakerIcon}
-            color="from-blue-500 to-blue-600"
-            onClick={() => {/* Navigate to parameters */}}
-          />
-          <QuickActionCard
-            title="Quality Analysis"
-            description="Analyze response quality with comprehensive metrics"
-            icon={ChartBarIcon}
-            color="from-emerald-500 to-emerald-600"
-            onClick={() => {/* Navigate to quality */}}
-          />
-          <QuickActionCard
-            title="Batch Experiments"
-            description="Run multiple parameter combinations simultaneously"
-            icon={CpuChipIcon}
-            color="from-purple-500 to-purple-600"
-            onClick={() => {/* Navigate to batch */}}
-          />
-        </div>
-      </div>
-
-      {/* Recent Activity Preview */}
-      <div>
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Recent Experiments</h2>
-          <button className="text-blue-600 hover:text-blue-700 font-medium">View All</button>
-        </div>
-        <div className="space-y-4">
-          {recentExperiments.slice(0, 3).map((experiment) => (
-            <div key={experiment.id} className="bg-white rounded-xl border border-gray-200 p-4 hover:shadow-md transition-all duration-300">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="font-semibold text-gray-900">{experiment.name}</h3>
-                  <p className="text-sm text-gray-600">{experiment.model} • {experiment.timestamp}</p>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-bold" style={{ color: getQualityColor(experiment.qualityScore) }}>
-                    {experiment.qualityScore}%
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+        <button className="bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg p-3 hover:from-blue-600 hover:to-blue-700 transition-all duration-200 text-left">
+          <div className="flex items-center space-x-2">
+            <PlayIcon className="w-5 h-5" />
+            <span className="font-medium">New Experiment</span>
+          </div>
+          <p className="text-blue-100 text-xs mt-1">Start parameter testing</p>
+        </button>
+        
+        <button className="bg-gradient-to-r from-purple-500 to-purple-600 text-white rounded-lg p-3 hover:from-purple-600 hover:to-purple-700 transition-all duration-200 text-left">
+          <div className="flex items-center space-x-2">
+            <ChartBarIcon className="w-5 h-5" />
+            <span className="font-medium">Batch Analysis</span>
+          </div>
+          <p className="text-purple-100 text-xs mt-1">Run multiple tests</p>
+        </button>
+        
+        <button className="bg-gradient-to-r from-emerald-500 to-emerald-600 text-white rounded-lg p-3 hover:from-emerald-600 hover:to-emerald-700 transition-all duration-200 text-left">
+          <div className="flex items-center space-x-2">
+            <ChartPieIcon className="w-5 h-5" />
+            <span className="font-medium">Quality Metrics</span>
+          </div>
+          <p className="text-emerald-100 text-xs mt-1">Analyze results</p>
+        </button>
+        
+        <button className="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg p-3 hover:from-orange-600 hover:to-orange-700 transition-all duration-200 text-left">
+          <div className="flex items-center space-x-2">
+            <DocumentTextIcon className="w-5 h-5" />
+            <span className="font-medium">Compare Results</span>
+          </div>
+          <p className="text-orange-100 text-xs mt-1">Side-by-side analysis</p>
+        </button>
       </div>
     </div>
   );
