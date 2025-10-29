@@ -98,6 +98,29 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
       ]
     },
     {
+      title: 'Results & History',
+      items: [
+        {
+          id: 'single-results',
+          name: 'Experiment Results',
+          icon: ChartPieIcon,
+          description: 'Detailed individual experiment analysis'
+        },
+        {
+          id: 'batch-results',
+          name: 'Batch Analysis',
+          icon: ArrowTrendingUpIcon,
+          description: 'Comprehensive batch experiment insights'
+        },
+        {
+          id: 'history',
+          name: 'Experiment History',
+          icon: ClockIcon,
+          description: 'Browse and manage all experiments'
+        }
+      ]
+    },
+    {
       title: 'Data & Export',
       items: [
         {

@@ -12,6 +12,9 @@ import AdvancedAnalytics from './pages/AdvancedAnalytics';
 import DatasetManager from './pages/DatasetManager';
 import ModelManagement from './pages/ModelManagement';
 import DashboardSettings from './pages/DashboardSettings';
+import SingleExperimentResults from './pages/SingleExperimentResults';
+import BatchResultsAnalysis from './pages/BatchResultsAnalysis';
+import ExperimentHistory from './pages/ExperimentHistory';
 
 const EnhancedDashboardLayout = () => {
   const [activeSection, setActiveSection] = useState('overview');
@@ -39,6 +42,12 @@ const EnhancedDashboardLayout = () => {
         return <ModelManagement />;
       case 'settings':
         return <DashboardSettings />;
+      case 'single-results':
+        return <SingleExperimentResults />;
+      case 'batch-results':
+        return <BatchResultsAnalysis />;
+      case 'history':
+        return <ExperimentHistory />;
       default:
         return (
           <div className="flex items-center justify-center h-full">
@@ -66,7 +75,10 @@ const EnhancedDashboardLayout = () => {
       optimization: 'Auto-Optimizer',
       models: 'Model Management',
       presets: 'Parameter Presets',
-      settings: 'Settings'
+      settings: 'Settings',
+      'single-results': 'Experiment Results',
+      'batch-results': 'Batch Analysis',
+      'history': 'Experiment History'
     };
     return titles[activeSection] || 'Dashboard';
   };
