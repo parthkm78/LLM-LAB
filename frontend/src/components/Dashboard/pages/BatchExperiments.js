@@ -432,241 +432,327 @@ const BatchExperiments = () => {
       </div>
 
       <div className="p-6 space-y-6">
-        {/* Compact Horizontal Create New Job Section */}
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Create New Batch Job</h2>
-            <button
-              onClick={createBatch}
-              disabled={!batchConfig.name || !batchConfig.prompt || isCreatingBatch}
-              className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
-            >
-              <SquaresPlusIcon className="w-4 h-4" />
-              <span className="font-bold text-sm">{isCreatingBatch ? 'Creating...' : 'Create Batch'}</span>
-            </button>
+        {/* Redesigned Create New Batch Section */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-xl overflow-hidden">
+          {/* Header Section */}
+          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 px-6 py-4 border-b border-white/20">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                  <SquaresPlusIcon className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Create New Batch Job</h2>
+                  <p className="text-xs text-gray-600 font-medium">Configure parameters and launch batch experiments</p>
+                </div>
+              </div>
+              <button
+                onClick={createBatch}
+                disabled={!batchConfig.name || !batchConfig.prompt || isCreatingBatch}
+                className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-lg hover:from-blue-600 hover:to-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+              >
+                <SquaresPlusIcon className="w-4 h-4" />
+                <span className="font-bold text-sm">{isCreatingBatch ? 'Creating...' : 'Create Batch'}</span>
+              </button>
+            </div>
           </div>
 
-          {/* Horizontal Form Layout */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Column 1: Basic Info */}
-            <div className="space-y-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Batch Name</label>
-                <input
-                  type="text"
-                  value={batchConfig.name}
-                  onChange={(e) => setBatchConfig(prev => ({ ...prev, name: e.target.value }))}
-                  placeholder="e.g., Creative Writing Test"
-                  className="w-full px-3 py-2 border border-purple-200 rounded-lg bg-white/80 backdrop-blur-sm text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
-                />
-              </div>
+          {/* Form Content */}
+          <div className="p-6">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Model</label>
-                <select
-                  value={batchConfig.model}
-                  onChange={(e) => setBatchConfig(prev => ({ ...prev, model: e.target.value }))}
-                  className="w-full px-3 py-2 border border-purple-200 rounded-lg bg-white/80 backdrop-blur-sm text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
-                >
-                  <option value="gpt-4">GPT-4</option>
-                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-                  <option value="claude-3">Claude-3</option>
-                  <option value="gemini-pro">Gemini Pro</option>
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Iterations</label>
-                <input
-                  type="number"
-                  value={batchConfig.iterations}
-                  onChange={(e) => setBatchConfig(prev => ({ ...prev, iterations: parseInt(e.target.value) }))}
-                  min={1}
-                  max={10}
-                  className="w-full px-3 py-2 border border-purple-200 rounded-lg bg-white/80 backdrop-blur-sm text-sm focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
-                />
-              </div>
-            </div>
-
-            {/* Column 2: Prompt */}
-            <div>
-              <label className="block text-xs font-bold text-gray-700 mb-1 uppercase tracking-wider">Test Prompt</label>
-              <textarea
-                value={batchConfig.prompt}
-                onChange={(e) => setBatchConfig(prev => ({ ...prev, prompt: e.target.value }))}
-                placeholder="Enter the prompt to test with different parameters..."
-                rows={6}
-                className="w-full px-3 py-2 border border-purple-200 rounded-lg bg-white/80 backdrop-blur-sm text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
-              />
-            </div>
-
-            {/* Column 3: Parameters & Estimation */}
-            <div className="space-y-4">
-              {/* Compact Parameter Ranges */}
-              <div className="bg-gradient-to-r from-blue-50/80 to-purple-50/80 backdrop-blur-sm rounded-lg border border-white/30 p-3">
-                <h4 className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wider">Parameter Ranges</h4>
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Temperature</label>
-                    <div className="grid grid-cols-3 gap-2">
+              {/* Basic Configuration Section */}
+              <div className="lg:col-span-4">
+                <div className="bg-gradient-to-br from-blue-50/80 to-indigo-50/80 backdrop-blur-sm rounded-xl border border-blue-200/50 p-4 h-full">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="w-6 h-6 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">1</span>
+                    </div>
+                    <h3 className="text-sm font-bold text-blue-700 uppercase tracking-wider">Basic Configuration</h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Batch Name</label>
                       <input
-                        type="number"
-                        value={batchConfig.parameterRanges.temperature.min}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            temperature: { ...prev.parameterRanges.temperature, min: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={0.1}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Min"
-                      />
-                      <input
-                        type="number"
-                        value={batchConfig.parameterRanges.temperature.max}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            temperature: { ...prev.parameterRanges.temperature, max: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={0.1}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Max"
-                      />
-                      <input
-                        type="number"
-                        value={batchConfig.parameterRanges.temperature.step}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            temperature: { ...prev.parameterRanges.temperature, step: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={0.1}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Step"
+                        type="text"
+                        value={batchConfig.name}
+                        onChange={(e) => setBatchConfig(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="e.g., Creative Writing Analysis"
+                        className="w-full px-3 py-2.5 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Top-p</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <input
-                        type="number"
-                        value={batchConfig.parameterRanges.top_p.min}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            top_p: { ...prev.parameterRanges.top_p, min: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={0.1}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Min"
-                      />
-                      <input
-                        type="number"
-                        value={batchConfig.parameterRanges.top_p.max}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            top_p: { ...prev.parameterRanges.top_p, max: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={0.1}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Max"
-                      />
-                      <input
-                        type="number"
-                        value={batchConfig.parameterRanges.top_p.step}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            top_p: { ...prev.parameterRanges.top_p, step: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={0.1}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Step"
-                      />
+                    
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Model Selection</label>
+                      <select
+                        value={batchConfig.model}
+                        onChange={(e) => setBatchConfig(prev => ({ ...prev, model: e.target.value }))}
+                        className="w-full px-3 py-2.5 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
+                      >
+                        <option value="gpt-4">🤖 GPT-4</option>
+                        <option value="gpt-3.5-turbo">⚡ GPT-3.5 Turbo</option>
+                        <option value="claude-3">🧠 Claude-3</option>
+                        <option value="gemini-pro">💎 Gemini Pro</option>
+                      </select>
                     </div>
-                  </div>
 
-                  <div>
-                    <label className="block text-xs text-gray-600 mb-1">Max Tokens</label>
-                    <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Iterations per Combination</label>
                       <input
                         type="number"
-                        value={batchConfig.parameterRanges.max_tokens.min}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            max_tokens: { ...prev.parameterRanges.max_tokens, min: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={100}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Min"
+                        value={batchConfig.iterations}
+                        onChange={(e) => setBatchConfig(prev => ({ ...prev, iterations: parseInt(e.target.value) }))}
+                        min={1}
+                        max={10}
+                        className="w-full px-3 py-2.5 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
                       />
-                      <input
-                        type="number"
-                        value={batchConfig.parameterRanges.max_tokens.max}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            max_tokens: { ...prev.parameterRanges.max_tokens, max: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={100}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Max"
-                      />
-                      <input
-                        type="number"
-                        value={batchConfig.parameterRanges.max_tokens.step}
-                        onChange={(e) => setBatchConfig(prev => ({
-                          ...prev,
-                          parameterRanges: {
-                            ...prev.parameterRanges,
-                            max_tokens: { ...prev.parameterRanges.max_tokens, step: parseFloat(e.target.value) }
-                          }
-                        }))}
-                        step={100}
-                        className="w-full px-2 py-1 text-xs border border-purple-200 rounded bg-white/80"
-                        placeholder="Step"
-                      />
+                      <p className="text-xs text-gray-500 mt-1">Higher iterations improve accuracy</p>
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Compact Estimation */}
-              <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-lg border border-blue-200/50 p-3">
-                <h4 className="text-xs font-bold text-blue-700 mb-2 uppercase tracking-wider">Estimation</h4>
-                <div className="space-y-1 text-xs">
-                  <div className="flex justify-between">
-                    <span className="text-blue-600">Combinations:</span>
-                    <span className="font-bold text-blue-900">{estimatedCombinations}</span>
+              {/* Prompt Configuration Section */}
+              <div className="lg:col-span-4">
+                <div className="bg-gradient-to-br from-purple-50/80 to-pink-50/80 backdrop-blur-sm rounded-xl border border-purple-200/50 p-4 h-full">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="w-6 h-6 bg-gradient-to-br from-purple-500 to-purple-600 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">2</span>
+                    </div>
+                    <h3 className="text-sm font-bold text-purple-700 uppercase tracking-wider">Prompt Configuration</h3>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-600">Time:</span>
-                    <span className="font-bold text-blue-900">{Math.floor(estimatedTime / 60)}m {estimatedTime % 60}s</span>
+                  
+                  <div>
+                    <label className="block text-xs font-bold text-gray-700 mb-2 uppercase tracking-wider">Test Prompt</label>
+                    <textarea
+                      value={batchConfig.prompt}
+                      onChange={(e) => setBatchConfig(prev => ({ ...prev, prompt: e.target.value }))}
+                      placeholder="Enter the prompt to test with different parameters...
+
+Example:
+Write a creative story about a time traveler who discovers that changing the past has unexpected consequences."
+                      rows={8}
+                      className="w-full px-3 py-2.5 border border-purple-200 rounded-lg bg-white/90 backdrop-blur-sm text-sm resize-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200 shadow-sm"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">This prompt will be tested with all parameter combinations</p>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-blue-600">Cost:</span>
-                    <span className="font-bold text-blue-900">~${(estimatedCombinations * 0.003).toFixed(2)}</span>
+                </div>
+              </div>
+
+              {/* Parameters & Analysis Section */}
+              <div className="lg:col-span-4">
+                <div className="bg-gradient-to-br from-indigo-50/80 to-blue-50/80 backdrop-blur-sm rounded-xl border border-indigo-200/50 p-4 h-full">
+                  <div className="flex items-center space-x-2 mb-4">
+                    <div className="w-6 h-6 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-lg flex items-center justify-center">
+                      <span className="text-white text-xs font-bold">3</span>
+                    </div>
+                    <h3 className="text-sm font-bold text-indigo-700 uppercase tracking-wider">Parameters & Analysis</h3>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {/* Parameter Ranges */}
+                    <div className="bg-white/60 backdrop-blur-sm rounded-lg border border-white/40 p-3">
+                      <h4 className="text-xs font-bold text-gray-700 mb-3 uppercase tracking-wider">Parameter Ranges</h4>
+                      <div className="space-y-3">
+                        
+                        {/* Temperature */}
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1 font-medium">Temperature (Creativity)</label>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.temperature.min}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    temperature: { ...prev.parameterRanges.temperature, min: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={0.1}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Min"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Min</span>
+                            </div>
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.temperature.max}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    temperature: { ...prev.parameterRanges.temperature, max: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={0.1}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Max"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Max</span>
+                            </div>
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.temperature.step}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    temperature: { ...prev.parameterRanges.temperature, step: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={0.1}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Step"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Step</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Top-p */}
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1 font-medium">Top-p (Focus)</label>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.top_p.min}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    top_p: { ...prev.parameterRanges.top_p, min: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={0.1}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Min"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Min</span>
+                            </div>
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.top_p.max}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    top_p: { ...prev.parameterRanges.top_p, max: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={0.1}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Max"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Max</span>
+                            </div>
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.top_p.step}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    top_p: { ...prev.parameterRanges.top_p, step: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={0.1}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Step"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Step</span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Max Tokens */}
+                        <div>
+                          <label className="block text-xs text-gray-600 mb-1 font-medium">Max Tokens (Length)</label>
+                          <div className="grid grid-cols-3 gap-2">
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.max_tokens.min}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    max_tokens: { ...prev.parameterRanges.max_tokens, min: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={100}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Min"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Min</span>
+                            </div>
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.max_tokens.max}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    max_tokens: { ...prev.parameterRanges.max_tokens, max: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={100}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Max"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Max</span>
+                            </div>
+                            <div>
+                              <input
+                                type="number"
+                                value={batchConfig.parameterRanges.max_tokens.step}
+                                onChange={(e) => setBatchConfig(prev => ({
+                                  ...prev,
+                                  parameterRanges: {
+                                    ...prev.parameterRanges,
+                                    max_tokens: { ...prev.parameterRanges.max_tokens, step: parseFloat(e.target.value) }
+                                  }
+                                }))}
+                                step={100}
+                                className="w-full px-2 py-1.5 text-xs border border-indigo-200 rounded bg-white/80 focus:ring-1 focus:ring-indigo-400"
+                                placeholder="Step"
+                              />
+                              <span className="text-xs text-gray-400 block mt-0.5">Step</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Live Estimation */}
+                    <div className="bg-gradient-to-r from-emerald-500/10 to-teal-500/10 backdrop-blur-sm rounded-lg border border-emerald-200/50 p-3">
+                      <h4 className="text-xs font-bold text-emerald-700 mb-2 uppercase tracking-wider flex items-center">
+                        <SparklesIcon className="w-3 h-3 mr-1" />
+                        Live Estimation
+                      </h4>
+                      <div className="grid grid-cols-1 gap-2 text-xs">
+                        <div className="flex items-center justify-between">
+                          <span className="text-emerald-600 font-medium">Combinations:</span>
+                          <span className="font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">{estimatedCombinations}</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-emerald-600 font-medium">Est. Time:</span>
+                          <span className="font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">{Math.floor(estimatedTime / 60)}m {estimatedTime % 60}s</span>
+                        </div>
+                        <div className="flex items-center justify-between">
+                          <span className="text-emerald-600 font-medium">Est. Cost:</span>
+                          <span className="font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">~${(estimatedCombinations * 0.003).toFixed(2)}</span>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
