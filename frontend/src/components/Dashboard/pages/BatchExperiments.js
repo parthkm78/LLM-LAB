@@ -15,9 +15,79 @@ import {
   InformationCircleIcon,
   TrashIcon,
   EyeIcon,
-  ArrowDownTrayIcon
+  ArrowDownTrayIcon,
+  ArrowLeftIcon,
+  TrophyIcon,
+  BeakerIcon,
+  CpuChipIcon,
+  BoltIcon,
+  ChartPieIcon
 } from '@heroicons/react/24/outline';
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, RadarChart, PolarGrid, PolarAngleAxis, PolarRadiusAxis, Radar, ScatterChart, Scatter } from 'recharts';
 import { designTokens, getParameterColor, getQualityColor } from '../../../styles/designTokens';
+
+// Helper functions to generate mock data
+const generateMockResults = (count) => {
+  const results = [];
+  for (let i = 0; i < count; i++) {
+    const temperature = Math.round((0.1 + Math.random() * 0.9) * 10) / 10;
+    const top_p = Math.round((0.7 + Math.random() * 0.3) * 10) / 10;
+    const max_tokens = 500 + Math.floor(Math.random() * 4) * 250;
+    
+    results.push({
+      id: i + 1,
+      temperature,
+      top_p,
+      max_tokens,
+      overall_quality: Math.round(60 + Math.random() * 40),
+      coherence: Math.round(55 + Math.random() * 45),
+      creativity: Math.round(50 + Math.random() * 50),
+      readability: Math.round(65 + Math.random() * 35),
+      completeness: Math.round(60 + Math.random() * 40),
+      response_time: Math.round((1.5 + Math.random() * 3.5) * 100) / 100,
+      cost: Math.round((0.001 + Math.random() * 0.008) * 10000) / 10000,
+      content: `Generated response ${i + 1} with temperature=${temperature}, top_p=${top_p}`,
+      timestamp: new Date(Date.now() - Math.random() * 1000 * 60 * 60)
+    });
+  }
+  return results.sort((a, b) => b.overall_quality - a.overall_quality);
+};
+
+const generateQualityTrends = () => {
+  const trends = [];
+  for (let i = 0; i < 20; i++) {
+    trends.push({
+      combination: i + 1,
+      overall_quality: Math.round(65 + Math.random() * 30),
+      coherence: Math.round(60 + Math.random() * 35),
+      creativity: Math.round(55 + Math.random() * 40),
+      readability: Math.round(70 + Math.random() * 25),
+      completeness: Math.round(65 + Math.random() * 30)
+    });
+  }
+  return trends;
+};
+
+const generateParameterAnalysis = () => ({
+  temperature: {
+    optimal: 0.8,
+    range: [0.1, 1.0],
+    correlation: 0.75,
+    insight: 'Higher temperature significantly improves creativity while maintaining coherence'
+  },
+  top_p: {
+    optimal: 0.9,
+    range: [0.7, 1.0],
+    correlation: 0.45,
+    insight: 'Values above 0.85 show diminishing returns on overall quality'
+  },
+  max_tokens: {
+    optimal: 1500,
+    range: [500, 2000],
+    correlation: 0.32,
+    insight: 'Sweet spot between 1000-1500 tokens for balanced completeness and conciseness'
+  }
+});
 
 const BatchExperiments = () => {
   const [batchConfig, setBatchConfig] = useState({
@@ -37,14 +107,39 @@ const BatchExperiments = () => {
     {
       id: 1,
       name: 'Creative Writing Analysis',
+      description: 'Testing optimal parameters for creative content generation across multiple temperature and top_p values',
       status: 'completed',
       progress: 100,
       totalCombinations: 120,
       completedCombinations: 120,
       startTime: new Date(Date.now() - 1000 * 60 * 45),
       endTime: new Date(Date.now() - 1000 * 60 * 5),
-      bestResult: { quality: 94, temperature: 0.8, top_p: 0.9 },
-      averageQuality: 87.5
+      bestResult: { 
+        quality: 94, 
+        temperature: 0.8, 
+        top_p: 0.9,
+        coherence: 92,
+        creativity: 96,
+        readability: 89,
+        completeness: 91
+      },
+      averageQuality: 87.5,
+      prompt: 'Write a creative short story about artificial intelligence discovering emotions for the first time. The story should be engaging, original, and thought-provoking.',
+      model: 'gpt-4',
+      parameterRanges: {
+        temperature: { min: 0.1, max: 1.0, step: 0.1 },
+        top_p: { min: 0.7, max: 1.0, step: 0.1 },
+        max_tokens: { min: 500, max: 2000, step: 250 }
+      },
+      results: generateMockResults(120),
+      qualityTrends: generateQualityTrends(),
+      parameterAnalysis: generateParameterAnalysis(),
+      insights: [
+        'Higher temperature (0.8-0.9) significantly improves creativity scores',
+        'Top_p values above 0.85 show diminishing returns on quality',
+        'Sweet spot identified: temperature=0.8, top_p=0.9 for creative writing',
+        'Max tokens between 1000-1500 provide optimal completeness'
+      ]
     },
     {
       id: 2,
@@ -366,8 +461,449 @@ const BatchExperiments = () => {
     );
   };
 
+  // Comprehensive Batch Results Analysis View
+  const BatchResultsAnalysisView = ({ job }) => {
+    const [analysisTab, setAnalysisTab] = useState('overview'); // 'overview', 'quality-analysis', 'parameter-optimization', 'detailed-results'
+    
+    return (
+      <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+        {/* Results Header */}
+        <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white py-8">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <button
+                  onClick={() => setSelectedJob(null)}
+                  className="flex items-center space-x-2 px-3 py-1.5 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-lg hover:bg-white/30 transition-all duration-300 mb-4"
+                >
+                  <ArrowLeftIcon className="w-4 h-4" />
+                  <span className="text-sm">Back to Batch Jobs</span>
+                </button>
+                <h1 className="text-4xl font-bold mb-2">{job.name} - Results Analysis</h1>
+                <p className="text-blue-100 text-lg mb-4">
+                  Comprehensive analysis of {job.completedCombinations} parameter combinations
+                </p>
+                <div className="flex items-center space-x-6 text-sm">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircleIcon className="w-5 h-5 text-green-400" />
+                    <span>Completed on {job.endTime?.toLocaleDateString()}</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <ClockIcon className="w-5 h-5 text-blue-300" />
+                    <span>Duration: {Math.round((job.endTime - job.startTime) / (1000 * 60))} minutes</span>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <TrophyIcon className="w-5 h-5 text-yellow-400" />
+                    <span>Best Quality: {job.bestResult.quality}%</span>
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center space-x-3 mt-6 lg:mt-0">
+                <button className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl hover:bg-white/30 transition-all duration-300">
+                  <ArrowDownTrayIcon className="w-5 h-5" />
+                  <span>Export Full Report</span>
+                </button>
+                <button className="flex items-center space-x-2 px-4 py-2 bg-emerald-500 backdrop-blur-sm border border-emerald-400/30 text-white rounded-xl hover:bg-emerald-600 transition-all duration-300">
+                  <BoltIcon className="w-5 h-5" />
+                  <span>Apply Best Config</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Analysis Navigation Tabs */}
+        <div className="bg-white border-b border-gray-200 sticky top-0 z-10 shadow-sm">
+          <div className="max-w-7xl mx-auto px-6">
+            <div className="flex space-x-8 overflow-x-auto">
+              {[
+                { id: 'overview', label: 'Overview & Summary', icon: ChartPieIcon },
+                { id: 'quality-analysis', label: 'Quality Analysis', icon: TrophyIcon },
+                { id: 'parameter-optimization', label: 'Parameter Optimization', icon: AdjustmentsHorizontalIcon },
+                { id: 'detailed-results', label: 'Detailed Results', icon: DocumentTextIcon }
+              ].map((tab) => (
+                <button
+                  key={tab.id}
+                  onClick={() => setAnalysisTab(tab.id)}
+                  className={`flex items-center space-x-2 px-6 py-4 border-b-2 transition-all duration-300 ${
+                    analysisTab === tab.id
+                      ? 'border-blue-500 text-blue-600 bg-blue-50'
+                      : 'border-transparent text-gray-600 hover:text-gray-900 hover:border-gray-300'
+                  }`}
+                >
+                  <tab.icon className="w-5 h-5" />
+                  <span className="font-medium whitespace-nowrap">{tab.label}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <div className="max-w-7xl mx-auto px-6 py-8">
+          {analysisTab === 'overview' && <OverviewAnalysis job={job} />}
+          {analysisTab === 'quality-analysis' && <QualityAnalysis job={job} />}
+          {analysisTab === 'parameter-optimization' && <ParameterOptimization job={job} />}
+          {analysisTab === 'detailed-results' && <DetailedResults job={job} />}
+        </div>
+      </div>
+    );
+  };
+
+  // Overview Analysis Component
+  const OverviewAnalysis = ({ job }) => (
+    <div className="space-y-8">
+      {/* Key Performance Indicators */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
+              <TrophyIcon className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-emerald-600 text-sm font-medium">Best Result</span>
+          </div>
+          <div className="text-3xl font-bold text-emerald-600 mb-1">{job.bestResult.quality}%</div>
+          <div className="text-emerald-700 text-sm">Quality Score</div>
+          <div className="text-xs text-gray-500 mt-2">
+            Temp: {job.bestResult.temperature}, Top-p: {job.bestResult.top_p}
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+              <ChartBarIcon className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-blue-600 text-sm font-medium">Average</span>
+          </div>
+          <div className="text-3xl font-bold text-blue-600 mb-1">{job.averageQuality}%</div>
+          <div className="text-blue-700 text-sm">Quality Score</div>
+          <div className="text-xs text-gray-500 mt-2">
+            Across all {job.completedCombinations} tests
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+              <SquaresPlusIcon className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-purple-600 text-sm font-medium">Coverage</span>
+          </div>
+          <div className="text-3xl font-bold text-purple-600 mb-1">{job.completedCombinations}</div>
+          <div className="text-purple-700 text-sm">Combinations</div>
+          <div className="text-xs text-gray-500 mt-2">
+            100% completion rate
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-lg">
+          <div className="flex items-center justify-between mb-4">
+            <div className="w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center">
+              <ClockIcon className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-amber-600 text-sm font-medium">Efficiency</span>
+          </div>
+          <div className="text-3xl font-bold text-amber-600 mb-1">
+            {Math.round((job.endTime - job.startTime) / (1000 * 60))}m
+          </div>
+          <div className="text-amber-700 text-sm">Total Duration</div>
+          <div className="text-xs text-gray-500 mt-2">
+            {Math.round((job.endTime - job.startTime) / (1000 * job.completedCombinations))}s per test
+          </div>
+        </div>
+      </div>
+
+      {/* Quality Trends Chart */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Quality Trends Across Parameter Combinations</h3>
+        <div style={{ width: '100%', height: '400px' }}>
+          <ResponsiveContainer>
+            <LineChart data={job.qualityTrends}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="combination" />
+              <YAxis domain={[0, 100]} />
+              <Tooltip />
+              <Legend />
+              <Line type="monotone" dataKey="overall_quality" stroke="#3B82F6" strokeWidth={3} name="Overall Quality" />
+              <Line type="monotone" dataKey="coherence" stroke="#10B981" strokeWidth={2} name="Coherence" />
+              <Line type="monotone" dataKey="creativity" stroke="#8B5CF6" strokeWidth={2} name="Creativity" />
+              <Line type="monotone" dataKey="readability" stroke="#F59E0B" strokeWidth={2} name="Readability" />
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
+      {/* Key Insights */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Key Insights & Recommendations</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {job.insights.map((insight, index) => (
+            <div key={index} className="flex items-start space-x-3 p-4 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg border border-blue-200">
+              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                <span className="text-white text-xs font-bold">{index + 1}</span>
+              </div>
+              <p className="text-gray-700 leading-relaxed">{insight}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+
+  // Quality Analysis Component
+  const QualityAnalysis = ({ job }) => (
+    <div className="space-y-8">
+      {/* Quality Metrics Breakdown */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Quality Metrics Breakdown</h3>
+        
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          {/* Radar Chart */}
+          <div>
+            <h4 className="text-lg font-bold text-gray-900 mb-4">Best Result Quality Profile</h4>
+            <div style={{ width: '100%', height: '300px' }}>
+              <ResponsiveContainer>
+                <RadarChart data={[
+                  {
+                    metric: 'Coherence',
+                    value: job.bestResult.coherence,
+                    fullMark: 100
+                  },
+                  {
+                    metric: 'Creativity',
+                    value: job.bestResult.creativity,
+                    fullMark: 100
+                  },
+                  {
+                    metric: 'Readability',
+                    value: job.bestResult.readability,
+                    fullMark: 100
+                  },
+                  {
+                    metric: 'Completeness',
+                    value: job.bestResult.completeness,
+                    fullMark: 100
+                  }
+                ]}>
+                  <PolarGrid />
+                  <PolarAngleAxis dataKey="metric" />
+                  <PolarRadiusAxis angle={90} domain={[0, 100]} />
+                  <Radar
+                    name="Best Result"
+                    dataKey="value"
+                    stroke="#3B82F6"
+                    fill="#3B82F6"
+                    fillOpacity={0.2}
+                    strokeWidth={2}
+                  />
+                </RadarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          {/* Quality Distribution */}
+          <div>
+            <h4 className="text-lg font-bold text-gray-900 mb-4">Quality Score Distribution</h4>
+            <div className="space-y-4">
+              {[
+                { label: 'Coherence', value: job.bestResult.coherence, color: 'emerald' },
+                { label: 'Creativity', value: job.bestResult.creativity, color: 'purple' },
+                { label: 'Readability', value: job.bestResult.readability, color: 'blue' },
+                { label: 'Completeness', value: job.bestResult.completeness, color: 'amber' }
+              ].map((metric) => (
+                <div key={metric.label} className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-medium text-gray-700">{metric.label}</span>
+                    <span className={`text-lg font-bold text-${metric.color}-600`}>{metric.value}%</span>
+                  </div>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className={`bg-${metric.color}-500 h-3 rounded-full transition-all duration-500`}
+                      style={{ width: `${metric.value}%` }}
+                    ></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Top 10 Results */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Top 10 Performing Configurations</h3>
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Rank</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Temperature</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Top-p</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Max Tokens</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Quality</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Coherence</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Creativity</th>
+              </tr>
+            </thead>
+            <tbody>
+              {job.results?.slice(0, 10).map((result, index) => (
+                <tr key={result.id} className={`border-b border-gray-100 ${index === 0 ? 'bg-emerald-50' : 'hover:bg-gray-50'}`}>
+                  <td className="py-3 px-4">
+                    <div className="flex items-center space-x-2">
+                      {index === 0 && <TrophyIcon className="w-4 h-4 text-yellow-500" />}
+                      <span className="font-bold text-gray-900">#{index + 1}</span>
+                    </div>
+                  </td>
+                  <td className="py-3 px-4 text-gray-700">{result.temperature}</td>
+                  <td className="py-3 px-4 text-gray-700">{result.top_p}</td>
+                  <td className="py-3 px-4 text-gray-700">{result.max_tokens}</td>
+                  <td className="py-3 px-4">
+                    <span className={`font-bold ${getQualityColor(result.overall_quality)}`}>
+                      {result.overall_quality}%
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-gray-700">{result.coherence}%</td>
+                  <td className="py-3 px-4 text-gray-700">{result.creativity}%</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Parameter Optimization Component
+  const ParameterOptimization = ({ job }) => (
+    <div className="space-y-8">
+      {/* Parameter Analysis Cards */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {Object.entries(job.parameterAnalysis).map(([param, analysis]) => (
+          <div key={param} className="bg-white rounded-xl border border-gray-200 shadow-lg p-6">
+            <h4 className="text-lg font-bold text-gray-900 mb-4 capitalize">{param.replace('_', ' ')}</h4>
+            <div className="space-y-4">
+              <div>
+                <div className="text-sm text-gray-600 mb-1">Optimal Value</div>
+                <div className="text-2xl font-bold text-blue-600">{analysis.optimal}</div>
+              </div>
+              <div>
+                <div className="text-sm text-gray-600 mb-1">Correlation with Quality</div>
+                <div className="flex items-center space-x-2">
+                  <div className="w-full bg-gray-200 rounded-full h-2">
+                    <div
+                      className="bg-blue-500 h-2 rounded-full"
+                      style={{ width: `${Math.abs(analysis.correlation) * 100}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-sm font-bold text-gray-700">{(analysis.correlation * 100).toFixed(0)}%</span>
+                </div>
+              </div>
+              <div className="bg-blue-50 rounded-lg p-3">
+                <p className="text-sm text-blue-800">{analysis.insight}</p>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Parameter Correlation Heatmap */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Parameter Impact on Quality Metrics</h3>
+        <div style={{ width: '100%', height: '400px' }}>
+          <ResponsiveContainer>
+            <BarChart data={[
+              { parameter: 'Temperature', coherence: 75, creativity: 95, readability: 65, completeness: 70 },
+              { parameter: 'Top-p', coherence: 45, creativity: 60, readability: 50, completeness: 40 },
+              { parameter: 'Max Tokens', coherence: 30, creativity: 25, readability: 40, completeness: 80 }
+            ]}>
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis dataKey="parameter" />
+              <YAxis />
+              <Tooltip />
+              <Legend />
+              <Bar dataKey="coherence" stackId="a" fill="#10B981" />
+              <Bar dataKey="creativity" stackId="a" fill="#8B5CF6" />
+              <Bar dataKey="readability" stackId="a" fill="#3B82F6" />
+              <Bar dataKey="completeness" stackId="a" fill="#F59E0B" />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+    </div>
+  );
+
+  // Detailed Results Component
+  const DetailedResults = ({ job }) => (
+    <div className="space-y-8">
+      {/* Export Options */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6">
+        <h3 className="text-lg font-bold text-gray-900 mb-4">Export Options</h3>
+        <div className="flex flex-wrap gap-3">
+          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+            <ArrowDownTrayIcon className="w-4 h-4" />
+            <span>Export as CSV</span>
+          </button>
+          <button className="flex items-center space-x-2 px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors">
+            <DocumentTextIcon className="w-4 h-4" />
+            <span>Export as JSON</span>
+          </button>
+          <button className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors">
+            <ChartBarIcon className="w-4 h-4" />
+            <span>Export Analysis Report</span>
+          </button>
+        </div>
+      </div>
+
+      {/* All Results Table */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+        <h3 className="text-xl font-bold text-gray-900 mb-6">Complete Results ({job.results?.length} configurations)</h3>
+        <div className="overflow-x-auto max-h-96 overflow-y-auto">
+          <table className="w-full">
+            <thead className="sticky top-0 bg-white">
+              <tr className="border-b border-gray-200">
+                <th className="text-left py-3 px-4 font-bold text-gray-900">ID</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Temperature</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Top-p</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Max Tokens</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Quality</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Coherence</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Creativity</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Time</th>
+                <th className="text-left py-3 px-4 font-bold text-gray-900">Cost</th>
+              </tr>
+            </thead>
+            <tbody>
+              {job.results?.map((result, index) => (
+                <tr key={result.id} className="border-b border-gray-100 hover:bg-gray-50">
+                  <td className="py-3 px-4 text-gray-700">{result.id}</td>
+                  <td className="py-3 px-4 text-gray-700">{result.temperature}</td>
+                  <td className="py-3 px-4 text-gray-700">{result.top_p}</td>
+                  <td className="py-3 px-4 text-gray-700">{result.max_tokens}</td>
+                  <td className="py-3 px-4">
+                    <span className={`font-bold ${getQualityColor(result.overall_quality)}`}>
+                      {result.overall_quality}%
+                    </span>
+                  </td>
+                  <td className="py-3 px-4 text-gray-700">{result.coherence}%</td>
+                  <td className="py-3 px-4 text-gray-700">{result.creativity}%</td>
+                  <td className="py-3 px-4 text-gray-700">{result.response_time}s</td>
+                  <td className="py-3 px-4 text-gray-700">${result.cost.toFixed(4)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  );
+
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-full">
+    <>
+      {selectedJob ? (
+        <BatchResultsAnalysisView job={selectedJob} />
+      ) : (
+        <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-full">
       {/* Compact Hero Section */}
       <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white">
         <div className="px-6 py-5">
@@ -819,7 +1355,9 @@ Write a creative story about a time traveler who discovers that changing the pas
           )}
         </div>
       </div>
-    </div>
+        </div>
+      )}
+    </>
   );
 };
 

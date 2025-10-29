@@ -58,12 +58,7 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
           icon: SquaresPlusIcon,
           description: 'Run multiple parameter combinations'
         },
-        {
-          id: 'presets',
-          name: 'Parameter Presets',
-          icon: BookOpenIcon,
-          description: 'Saved parameter configurations'
-        }
+       
       ]
     },
     {
@@ -88,13 +83,7 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
           icon: PresentationChartBarIcon,
           description: 'Trends, correlations, and insights'
         },
-        {
-          id: 'intelligence',
-          name: 'AI Insights',
-          icon: SparklesIcon,
-          description: 'AI-powered recommendations',
-          badge: 'New'
-        }
+       
       ]
     },
     {
@@ -174,30 +163,30 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
   };
 
   return (
-    <div className={`h-full bg-white/80 backdrop-blur-sm border-r border-white/20 shadow-xl transition-all duration-300 ${
+    <div className={`h-full bg-white/80 backdrop-blur-sm border-r border-white/20 shadow-xl transition-all duration-300 overflow-x-auto ${
       isCollapsed ? 'w-16' : 'w-64'
     }`}>
       {/* Header */}
-      <div className="p-4 border-b border-white/20">
+      <div className="p-4 border-b border-white/20 flex-shrink-0">
         <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-sm">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
             <CpuChipIcon className="w-5 h-5 text-white" />
           </div>
           {!isCollapsed && (
-            <div>
-              <h1 className="text-base font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">LLM Lab</h1>
-              <p className="text-xs text-gray-600 font-medium">Analysis Platform</p>
+            <div className="min-w-0 flex-1">
+              <h1 className="text-base font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent whitespace-nowrap">LLM Lab</h1>
+              <p className="text-xs text-gray-600 font-medium whitespace-nowrap">Analysis Platform</p>
             </div>
           )}
         </div>
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto py-3 space-y-4">
+      <div className="flex-1 overflow-y-auto overflow-x-auto py-3 space-y-4"  style={{ maxHeight: 'calc(100vh - 200px)' }}>
         {menuSections.map((section, sectionIndex) => (
-          <div key={sectionIndex} className="px-3">
+          <div key={sectionIndex} className="px-3 flex-shrink-0">
             {!isCollapsed && (
-              <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3 px-2">
+              <h3 className="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3 px-2 whitespace-nowrap">
                 {section.title}
               </h3>
             )}
@@ -211,7 +200,7 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
                   <button
                     key={item.id}
                     onClick={() => onSectionChange(item.id)}
-                    className={`w-full flex items-center group transition-all duration-200 rounded-lg ${
+                    className={`w-full flex items-center group transition-all duration-200 rounded-lg flex-shrink-0 ${
                       isActive
                         ? 'bg-gradient-to-r from-blue-50 to-purple-50 text-blue-700 shadow-sm border border-blue-200'
                         : 'text-gray-600 hover:text-blue-700 hover:bg-white/60'
@@ -224,16 +213,16 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
                     
                     {!isCollapsed && (
                       <>
-                        <div className="flex-1 ml-3 text-left">
+                        <div className="flex-1 ml-3 text-left min-w-0">
                           <div className="flex items-center space-x-2">
-                            <span className="text-sm font-bold">{item.name}</span>
+                            <span className="text-sm font-bold whitespace-nowrap overflow-hidden text-ellipsis">{item.name}</span>
                             {item.badge && (
-                              <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full ${getBadgeColor(item.badge)}`}>
+                              <span className={`px-1.5 py-0.5 text-xs font-bold rounded-full flex-shrink-0 ${getBadgeColor(item.badge)}`}>
                                 {item.badge}
                               </span>
                             )}
                           </div>
-                          <p className="text-xs text-gray-500 mt-0.5 leading-tight line-clamp-1">{item.description}</p>
+                          <p className="text-xs text-gray-500 mt-0.5 leading-tight line-clamp-1 whitespace-nowrap overflow-hidden text-ellipsis">{item.description}</p>
                         </div>
                       </>
                     )}
@@ -246,15 +235,15 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
       </div>
 
       {/* User Section */}
-      <div className="p-3 border-t border-white/20">
+      <div className="p-3 border-t border-white/20 flex-shrink-0">
         {!isCollapsed ? (
-          <div className="flex items-center space-x-3 p-2.5 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 hover:from-emerald-100 hover:to-teal-100 transition-all duration-200 cursor-pointer">
-            <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center shadow-sm">
+          <div className="flex items-center space-x-3 p-2.5 rounded-lg bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 hover:from-emerald-100 hover:to-teal-100 transition-all duration-200 cursor-pointer min-w-0">
+            <div className="w-7 h-7 bg-gradient-to-br from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center shadow-sm flex-shrink-0">
               <UserIcon className="w-4 h-4 text-white" />
             </div>
-            <div className="flex-1">
-              <p className="text-sm font-bold text-gray-900">User</p>
-              <p className="text-xs text-emerald-700 font-medium">Pro Plan</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-gray-900 whitespace-nowrap overflow-hidden text-ellipsis">User</p>
+              <p className="text-xs text-emerald-700 font-medium whitespace-nowrap overflow-hidden text-ellipsis">Pro Plan</p>
             </div>
           </div>
         ) : (
@@ -265,17 +254,17 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
       </div>
 
       {/* Help Section */}
-      <div className="p-3">
+      <div className="p-3 flex-shrink-0">
         {!isCollapsed ? (
-          <div className="p-3 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-blue-200 shadow-sm">
+          <div className="p-3 bg-gradient-to-br from-blue-50 to-purple-50 rounded-xl border border-blue-200 shadow-sm min-w-0">
             <div className="flex items-center space-x-2 mb-2">
-              <QuestionMarkCircleIcon className="w-4 h-4 text-blue-600" />
-              <span className="text-sm font-bold text-blue-900">Need Help?</span>
+              <QuestionMarkCircleIcon className="w-4 h-4 text-blue-600 flex-shrink-0" />
+              <span className="text-sm font-bold text-blue-900 whitespace-nowrap overflow-hidden text-ellipsis">Need Help?</span>
             </div>
             <p className="text-xs text-blue-700 mb-3 leading-relaxed">
               Explore our comprehensive guide to maximize your LLM analysis workflow.
             </p>
-            <button className="w-full px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-sm hover:shadow-md">
+            <button className="w-full px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold rounded-lg hover:from-blue-600 hover:to-purple-600 transition-all duration-200 shadow-sm hover:shadow-md whitespace-nowrap">
               View Documentation
             </button>
           </div>
