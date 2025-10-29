@@ -28,7 +28,7 @@ import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, Cartesia
 const ResponseComparison = () => {
   // Core State Management
   const [selectedResponses, setSelectedResponses] = useState([]);
-  const [viewMode, setViewMode] = useState('search-and-select'); // 'search-and-select', 'detailed-comparison', 'analytics-dashboard'
+  const [viewMode, setViewMode] = useState('all-responses'); // 'all-responses', 'search-and-select', 'detailed-comparison', 'advanced-analysis'
   const [comparisonMode, setComparisonMode] = useState('comprehensive'); // 'comprehensive', 'metrics-only', 'content-only', 'performance'
   
   // Search and Filter State
@@ -935,6 +935,333 @@ const ResponseComparison = () => {
     );
   };
 
+  // All Responses View Component
+  const AllResponsesView = () => (
+    <div className="space-y-8">
+      {/* Overview Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="text-3xl font-bold text-blue-600 mb-2">{allResponses.length}</div>
+          <div className="text-gray-600 font-medium">Total Responses</div>
+          <div className="text-xs text-gray-500 mt-1">Available for analysis</div>
+        </div>
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="text-3xl font-bold text-emerald-600 mb-2">
+            {Math.round(allResponses.reduce((sum, r) => sum + r.metrics.overall_quality, 0) / allResponses.length)}%
+          </div>
+          <div className="text-gray-600 font-medium">Average Quality</div>
+          <div className="text-xs text-gray-500 mt-1">Across all responses</div>
+        </div>
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="text-3xl font-bold text-purple-600 mb-2">
+            {new Set(allResponses.map(r => r.model)).size}
+          </div>
+          <div className="text-gray-600 font-medium">Models</div>
+          <div className="text-xs text-gray-500 mt-1">Different LLM models</div>
+        </div>
+        <div className="bg-white rounded-xl p-6 border border-gray-200 shadow-sm">
+          <div className="text-3xl font-bold text-amber-600 mb-2">
+            {selectedResponses.length}
+          </div>
+          <div className="text-gray-600 font-medium">Selected</div>
+          <div className="text-xs text-gray-500 mt-1">For comparison</div>
+        </div>
+      </div>
+
+      {/* Quick Start Actions */}
+      <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-8 border border-blue-200">
+        <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+          Quick Start Your Analysis
+        </h2>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <button
+            onClick={() => setViewMode('search-and-select')}
+            className="bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg group"
+          >
+            <MagnifyingGlassIcon className="w-12 h-12 text-blue-500 mb-4 group-hover:scale-110 transition-transform" />
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Search & Filter</h3>
+            <p className="text-gray-600 text-sm">Find specific responses using advanced search and filtering options</p>
+          </button>
+          
+          <button
+            onClick={() => setViewMode('detailed-comparison')}
+            className="bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg group"
+          >
+            <ArrowsRightLeftIcon className="w-12 h-12 text-green-500 mb-4 group-hover:scale-110 transition-transform" />
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Compare Responses</h3>
+            <p className="text-gray-600 text-sm">Side-by-side comparison with detailed metrics and insights</p>
+          </button>
+          
+          <button
+            onClick={() => setViewMode('advanced-analysis')}
+            className="bg-white rounded-xl p-6 border border-gray-200 hover:border-blue-300 transition-all duration-300 hover:shadow-lg group"
+          >
+            <ChartBarIcon className="w-12 h-12 text-purple-500 mb-4 group-hover:scale-110 transition-transform" />
+            <h3 className="text-lg font-bold text-gray-900 mb-2">Advanced Analysis</h3>
+            <p className="text-gray-600 text-sm">Comprehensive analysis with interactive charts and deep insights</p>
+          </button>
+        </div>
+      </div>
+
+      {/* Response Library Preview */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6">
+        <div className="flex items-center justify-between mb-6">
+          <h3 className="text-xl font-bold text-gray-900">Response Library Preview</h3>
+          <button
+            onClick={() => setViewMode('search-and-select')}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            View All Responses
+          </button>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {allResponses.slice(0, 6).map((response) => (
+            <ResponseCard 
+              key={response.id} 
+              response={response} 
+              isSelected={selectedResponses.some(r => r.id === response.id)}
+              showAddButton={true}
+            />
+          ))}
+        </div>
+        
+        {allResponses.length > 6 && (
+          <div className="text-center mt-6">
+            <p className="text-gray-500 mb-4">Showing 6 of {allResponses.length} responses</p>
+            <button
+              onClick={() => setViewMode('search-and-select')}
+              className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              View All {allResponses.length} Responses
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
+  // Advanced Analysis Component
+  const AdvancedAnalysisView = () => {
+    const [analysisTab, setAnalysisTab] = useState('overview'); // 'overview', 'comparison', 'insights', 'charts'
+    
+    return (
+      <div className="space-y-8">
+        {/* Analysis Header */}
+        <div className="bg-gradient-to-r from-purple-500 via-blue-500 to-indigo-500 rounded-xl p-6 text-white">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h2 className="text-3xl font-bold mb-2">Advanced Response Analysis</h2>
+              <p className="text-blue-100 text-lg">
+                Deep insights and comprehensive metrics for {selectedResponses.length > 0 ? `${selectedResponses.length} selected responses` : 'all responses'}
+              </p>
+            </div>
+            <div className="flex items-center space-x-3 mt-4 lg:mt-0">
+              <button
+                onClick={() => setViewMode('search-and-select')}
+                className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl hover:bg-white/30 transition-all duration-300"
+              >
+                <PlusIcon className="w-4 h-4" />
+                <span>Add More Responses</span>
+              </button>
+              <button className="flex items-center space-x-2 px-4 py-2 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl hover:bg-white/30 transition-all duration-300">
+                <ShareIcon className="w-4 h-4" />
+                <span>Export Analysis</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Analysis Navigation Tabs */}
+        <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-2">
+          <div className="flex space-x-2">
+            {[
+              { id: 'overview', label: 'Overview & Stats', icon: ChartBarIcon },
+              { id: 'comparison', label: 'Detailed Comparison', icon: ArrowsRightLeftIcon },
+              { id: 'insights', label: 'AI Insights', icon: BeakerIcon },
+              { id: 'charts', label: 'Interactive Charts', icon: CpuChipIcon }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setAnalysisTab(tab.id)}
+                className={`flex items-center space-x-2 px-6 py-3 rounded-lg transition-all duration-300 ${
+                  analysisTab === tab.id
+                    ? 'bg-blue-500 text-white shadow-lg'
+                    : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                <tab.icon className="w-5 h-5" />
+                <span className="font-medium">{tab.label}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {analysisTab === 'overview' && (
+          <div className="space-y-8">
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-xl p-6 border border-emerald-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-emerald-500 rounded-lg flex items-center justify-center">
+                    <StarIconSolid className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-emerald-600 text-sm font-medium">Quality</span>
+                </div>
+                <div className="text-3xl font-bold text-emerald-600 mb-1">
+                  {selectedResponses.length > 0 
+                    ? Math.round(selectedResponses.reduce((sum, r) => sum + r.metrics.overall_quality, 0) / selectedResponses.length)
+                    : Math.round(allResponses.reduce((sum, r) => sum + r.metrics.overall_quality, 0) / allResponses.length)
+                  }%
+                </div>
+                <div className="text-emerald-700 text-sm">Average Quality Score</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-6 border border-blue-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-blue-500 rounded-lg flex items-center justify-center">
+                    <CpuChipIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-blue-600 text-sm font-medium">Performance</span>
+                </div>
+                <div className="text-3xl font-bold text-blue-600 mb-1">
+                  {selectedResponses.length > 0 
+                    ? (selectedResponses.reduce((sum, r) => sum + r.responseTime, 0) / selectedResponses.length).toFixed(1)
+                    : (allResponses.reduce((sum, r) => sum + r.responseTime, 0) / allResponses.length).toFixed(1)
+                  }s
+                </div>
+                <div className="text-blue-700 text-sm">Average Response Time</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-purple-50 to-violet-50 rounded-xl p-6 border border-purple-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <BeakerIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-purple-600 text-sm font-medium">Creativity</span>
+                </div>
+                <div className="text-3xl font-bold text-purple-600 mb-1">
+                  {selectedResponses.length > 0 
+                    ? Math.round(selectedResponses.reduce((sum, r) => sum + r.metrics.creativity_score, 0) / selectedResponses.length)
+                    : Math.round(allResponses.reduce((sum, r) => sum + r.metrics.creativity_score, 0) / allResponses.length)
+                  }%
+                </div>
+                <div className="text-purple-700 text-sm">Average Creativity Score</div>
+              </div>
+
+              <div className="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-6 border border-amber-200">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="w-12 h-12 bg-amber-500 rounded-lg flex items-center justify-center">
+                    <DocumentTextIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <span className="text-amber-600 text-sm font-medium">Cost</span>
+                </div>
+                <div className="text-3xl font-bold text-amber-600 mb-1">
+                  ${selectedResponses.length > 0 
+                    ? (selectedResponses.reduce((sum, r) => sum + r.cost, 0) / selectedResponses.length).toFixed(4)
+                    : (allResponses.reduce((sum, r) => sum + r.cost, 0) / allResponses.length).toFixed(4)
+                  }
+                </div>
+                <div className="text-amber-700 text-sm">Average Cost per Request</div>
+              </div>
+            </div>
+
+            {/* Response Selection Interface */}
+            {selectedResponses.length === 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-8">
+                <div className="text-center">
+                  <MagnifyingGlassIcon className="w-16 h-16 text-gray-300 mx-auto mb-6" />
+                  <h3 className="text-2xl font-bold text-gray-900 mb-4">Select Responses for Analysis</h3>
+                  <p className="text-gray-600 mb-8 max-w-2xl mx-auto">
+                    Choose specific responses from the library to perform detailed comparison and analysis. You can select up to 6 responses.
+                  </p>
+                  <button
+                    onClick={() => setViewMode('search-and-select')}
+                    className="px-8 py-4 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-bold text-lg"
+                  >
+                    Browse Response Library
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Selected Responses Overview */}
+            {selectedResponses.length > 0 && (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold text-gray-900">Selected Responses ({selectedResponses.length})</h3>
+                  <button
+                    onClick={clearComparison}
+                    className="px-4 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors"
+                  >
+                    Clear Selection
+                  </button>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {selectedResponses.map((response, index) => (
+                    <EnhancedResponseCard 
+                      key={response.id} 
+                      response={response} 
+                      index={index}
+                      isSelected={true}
+                      showAddButton={false}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+
+        {analysisTab === 'comparison' && (
+          <div className="space-y-8">
+            {selectedResponses.length > 1 ? (
+              <ComparisonAnalytics responses={selectedResponses} />
+            ) : (
+              <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-12 text-center">
+                <ArrowsRightLeftIcon className="w-16 h-16 text-gray-300 mx-auto mb-6" />
+                <h3 className="text-2xl font-bold text-gray-900 mb-4">Select Multiple Responses</h3>
+                <p className="text-gray-600 mb-8">
+                  Choose at least 2 responses to see detailed comparison analytics and insights.
+                </p>
+                <button
+                  onClick={() => setViewMode('search-and-select')}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                  Select More Responses
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {analysisTab === 'insights' && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-12 text-center">
+            <BeakerIcon className="w-16 h-16 text-gray-300 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">AI-Powered Insights</h3>
+            <p className="text-gray-600 mb-8">
+              Advanced AI analysis and recommendations based on response patterns and quality metrics.
+            </p>
+            <div className="text-blue-600 font-medium">Coming Soon...</div>
+          </div>
+        )}
+
+        {analysisTab === 'charts' && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-12 text-center">
+            <CpuChipIcon className="w-16 h-16 text-gray-300 mx-auto mb-6" />
+            <h3 className="text-2xl font-bold text-gray-900 mb-4">Interactive Data Visualization</h3>
+            <p className="text-gray-600 mb-8">
+              Dynamic charts and visualizations for deep data exploration and pattern discovery.
+            </p>
+            <div className="text-purple-600 font-medium">Coming Soon...</div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
   return (
     <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
       {/* Enhanced Header */}
@@ -959,9 +1286,10 @@ const ResponseComparison = () => {
                     onChange={(e) => setViewMode(e.target.value)}
                     className="px-4 py-3 bg-white/90 backdrop-blur-sm border border-white/20 rounded-xl focus:ring-2 focus:ring-white/50 focus:border-white/50 text-gray-700 font-medium shadow-lg"
                   >
+                    <option value="all-responses">All Responses</option>
                     <option value="search-and-select">Search & Select</option>
                     <option value="detailed-comparison">Detailed Comparison</option>
-                    <option value="analytics-dashboard">Analytics Dashboard</option>
+                    <option value="advanced-analysis">Advanced Analysis</option>
                   </select>
                 </div>
                 <button className="flex items-center space-x-2 px-6 py-3 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl hover:bg-white/30 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:scale-105">
@@ -1064,18 +1392,12 @@ const ResponseComparison = () => {
           <DetailedComparisonView />
         )}
 
-        {viewMode === 'analytics-dashboard' && (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-lg p-12 text-center">
-            <ChartBarIcon className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-2xl font-bold text-gray-900 mb-2">Analytics Dashboard</h3>
-            <p className="text-gray-600 mb-6">Advanced analytics and insights coming soon...</p>
-            <button
-              onClick={() => setViewMode('search-and-select')}
-              className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-            >
-              Back to Search
-            </button>
-          </div>
+        {viewMode === 'all-responses' && (
+          <AllResponsesView />
+        )}
+
+        {viewMode === 'advanced-analysis' && (
+          <AdvancedAnalysisView />
         )}
       </div>
     </div>
