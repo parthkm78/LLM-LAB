@@ -520,7 +520,36 @@ const QualityMetrics = () => {
         </div>
       </div>
 
-      <div className="p-6 space-y-6">
+      {/* Tab Navigation */}
+      <div className="max-w-7xl mx-auto px-6 py-6">
+        <div className="flex items-center justify-center mb-8">
+          <div className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-2xl p-2 border border-purple-200/50 shadow-xl">
+            {[
+              { id: 'metrics', label: 'Metrics Breakdown', icon: ChartBarIcon },
+              { id: 'advanced', label: 'Advanced Analysis', icon: PresentationChartLineIcon }
+            ].map((tab) => {
+              const Icon = tab.icon;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`flex items-center space-x-3 px-6 py-3 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 ${
+                    activeTab === tab.id
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                      : 'text-purple-700 hover:bg-white/80 hover:shadow-md'
+                  }`}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        {activeTab === 'metrics' && (
+          <div className="p-6 space-y-6">
 
         {/* Compact Metric Breakdown */}
         <div>
@@ -593,45 +622,81 @@ const QualityMetrics = () => {
           </div>
         </div>
 
-        {/* Advanced Charts Section */}
-        <div className="bg-gradient-to-br from-blue-500/5 to-purple-500/5 backdrop-blur-sm rounded-3xl border border-purple-200/30 shadow-2xl p-8">
-          <div className="flex items-center justify-between mb-8">
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                <PresentationChartLineIcon className="w-6 h-6 text-white" />
+            {/* Enhanced Insights Section */}
+            <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-8">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
+                  <SparklesIcon className="w-6 h-6 text-white" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">AI-Powered Insights</h3>
+                  <div className="space-y-3">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200/50 p-4 shadow-lg">
+                      <h4 className="font-bold text-purple-900 mb-1">Parameter Optimization Opportunity</h4>
+                      <p className="text-purple-700 text-sm font-medium">
+                        Increasing temperature to 0.8 for creative prompts could improve creativity scores by an estimated 12%.
+                      </p>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200/50 p-4 shadow-lg">
+                      <h4 className="font-bold text-blue-900 mb-1">Model Performance Pattern</h4>
+                      <p className="text-blue-700 text-sm font-medium">
+                        GPT-4 consistently outperforms other models on technical content with 15% higher coherence scores.
+                      </p>
+                    </div>
+                    <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-emerald-200/50 p-4 shadow-lg">
+                      <h4 className="font-bold text-emerald-900 mb-1">Quality Improvement Trend</h4>
+                      <p className="text-emerald-700 text-sm font-medium">
+                        Overall quality has improved 5.2% this week, primarily driven by better readability optimization.
+                      </p>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <div>
-                <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Advanced Analytics</h2>
-                <p className="text-purple-600 font-medium">Comprehensive quality insights and trends</p>
-              </div>
-            </div>
-            
-            {/* Chart Navigation */}
-            <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-xl p-1 border border-purple-200">
-              {[
-                { id: 'trends', label: 'Trends', icon: PresentationChartLineIcon },
-                { id: 'distribution', label: 'Distribution', icon: ChartPieIcon },
-                { id: 'correlation', label: 'Correlation', icon: CubeTransparentIcon },
-                { id: 'advanced', label: 'Advanced', icon: TableCellsIcon }
-              ].map((view) => {
-                const Icon = view.icon;
-                return (
-                  <button
-                    key={view.id}
-                    onClick={() => setChartView(view.id)}
-                    className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
-                      chartView === view.id
-                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
-                        : 'text-purple-700 hover:bg-white/80 hover:shadow-md'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    <span className="text-sm font-bold">{view.label}</span>
-                  </button>
-                );
-              })}
             </div>
           </div>
+        )}
+
+        {activeTab === 'advanced' && (
+          <div className="space-y-6">
+            {/* Advanced Charts Section */}
+            <div className="bg-gradient-to-br from-blue-500/5 to-purple-500/5 backdrop-blur-sm rounded-3xl border border-purple-200/30 shadow-2xl p-8">
+              <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center space-x-4">
+                  <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <PresentationChartLineIcon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Advanced Analytics</h2>
+                    <p className="text-purple-600 font-medium">Comprehensive quality insights and trends</p>
+                  </div>
+                </div>
+                
+                {/* Chart Navigation */}
+                <div className="flex items-center space-x-2 bg-white/60 backdrop-blur-sm rounded-xl p-1 border border-purple-200">
+                  {[
+                    { id: 'trends', label: 'Trends', icon: PresentationChartLineIcon },
+                    { id: 'distribution', label: 'Distribution', icon: ChartPieIcon },
+                    { id: 'correlation', label: 'Correlation', icon: CubeTransparentIcon },
+                    { id: 'advanced', label: 'Advanced', icon: TableCellsIcon }
+                  ].map((view) => {
+                    const Icon = view.icon;
+                    return (
+                      <button
+                        key={view.id}
+                        onClick={() => setChartView(view.id)}
+                        className={`flex items-center space-x-2 px-4 py-2.5 rounded-lg font-medium transition-all duration-300 transform hover:scale-105 ${
+                          chartView === view.id
+                            ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-lg'
+                            : 'text-purple-700 hover:bg-white/80 hover:shadow-md'
+                        }`}
+                      >
+                        <Icon className="w-4 h-4" />
+                        <span className="text-sm font-bold">{view.label}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
           {/* Charts Grid */}
           {chartView === 'trends' && (
@@ -825,39 +890,9 @@ const QualityMetrics = () => {
               </div>
             </div>
           )}
-        </div>
-
-        {/* Enhanced Insights Section */}
-        <div className="bg-gradient-to-br from-purple-500/10 to-blue-500/10 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-8">
-          <div className="flex items-start space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-blue-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-              <SparklesIcon className="w-6 h-6 text-white" />
-            </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-4">AI-Powered Insights</h3>
-              <div className="space-y-3">
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-purple-200/50 p-4 shadow-lg">
-                  <h4 className="font-bold text-purple-900 mb-1">Parameter Optimization Opportunity</h4>
-                  <p className="text-purple-700 text-sm font-medium">
-                    Increasing temperature to 0.8 for creative prompts could improve creativity scores by an estimated 12%.
-                  </p>
-                </div>
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-blue-200/50 p-4 shadow-lg">
-                  <h4 className="font-bold text-blue-900 mb-1">Model Performance Pattern</h4>
-                  <p className="text-blue-700 text-sm font-medium">
-                    GPT-4 consistently outperforms other models on technical content with 15% higher coherence scores.
-                  </p>
-                </div>
-                <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-emerald-200/50 p-4 shadow-lg">
-                  <h4 className="font-bold text-emerald-900 mb-1">Quality Improvement Trend</h4>
-                  <p className="text-emerald-700 text-sm font-medium">
-                    Overall quality has improved 5.2% this week, primarily driven by better readability optimization.
-                  </p>
-                </div>
-              </div>
             </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );
