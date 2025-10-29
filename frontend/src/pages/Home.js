@@ -7,7 +7,8 @@ import {
   SparklesIcon,
   ArrowRightIcon,
   CpuChipIcon,
-  LightBulbIcon
+  LightBulbIcon,
+  PresentationChartBarIcon
 } from '@heroicons/react/24/outline';
 
 const FeatureCard = ({ icon: Icon, title, description, link, gradient }) => (
@@ -45,6 +46,13 @@ const StatCard = ({ value, label, icon: Icon }) => (
 
 const Home = () => {
   const features = [
+    {
+      icon: PresentationChartBarIcon,
+      title: "Interactive Dashboard",
+      description: "Comprehensive visual analytics with real-time metrics, parameter experimentation, and intelligent insights.",
+      link: "/dashboard",
+      gradient: "hover:bg-gradient-to-br hover:from-amber-50 hover:to-orange-50"
+    },
     {
       icon: BeakerIcon,
       title: "Parameter Testing",
@@ -110,18 +118,18 @@ const Home = () => {
             {/* CTA Buttons */}
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
               <Link 
-                to="/experiment" 
+                to="/dashboard" 
                 className="inline-flex items-center px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-2xl hover:from-blue-700 hover:to-purple-700 transform hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              >
+                <PresentationChartBarIcon className="w-5 h-5 mr-2" />
+                Open Dashboard
+              </Link>
+              <Link 
+                to="/experiment" 
+                className="inline-flex items-center px-8 py-4 bg-white text-gray-900 font-semibold rounded-2xl border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300"
               >
                 <BeakerIcon className="w-5 h-5 mr-2" />
                 Start Experimenting
-              </Link>
-              <Link 
-                to="/analysis" 
-                className="inline-flex items-center px-8 py-4 bg-white text-gray-900 font-semibold rounded-2xl border-2 border-gray-200 hover:border-blue-300 hover:bg-blue-50 transition-all duration-300"
-              >
-                <ChartBarIcon className="w-5 h-5 mr-2" />
-                View Analytics
               </Link>
             </div>
 

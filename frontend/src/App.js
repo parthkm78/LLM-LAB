@@ -17,6 +17,7 @@ import Comparison from './pages/Comparison';
 import About from './pages/About';
 import Settings from './pages/Settings';
 import SettingsTest from './pages/SettingsTest';
+import EnhancedDashboard from './pages/EnhancedDashboard';
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Layout />}>
               <Route index element={<Home />} />
+              <Route path="dashboard" element={<EnhancedDashboard />} />
               <Route path="experiment" element={<Experiment />} />
               <Route path="analysis" element={<Analysis />} />
               <Route path="comparison" element={<Comparison />} />

@@ -9,7 +9,8 @@ import {
   Cog6ToothIcon,
   DocumentTextIcon,
   HomeIcon,
-  SparklesIcon
+  SparklesIcon,
+  PresentationChartBarIcon
 } from '@heroicons/react/24/outline';
 
 const Navbar = () => {
@@ -27,6 +28,7 @@ const Navbar = () => {
 
   const navigation = [
     { name: 'Home', href: '/', icon: HomeIcon },
+    { name: 'Dashboard', href: '/dashboard', icon: PresentationChartBarIcon },
     { name: 'Experiment', href: '/experiment', icon: BeakerIcon },
     { name: 'Analysis', href: '/analysis', icon: ChartBarIcon },
     { name: 'Comparison', href: '/comparison', icon: DocumentTextIcon },
