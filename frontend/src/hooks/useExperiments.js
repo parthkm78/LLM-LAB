@@ -113,7 +113,7 @@ export const useExperiments = () => {
     
     try {
       const response = await responsesAPI.generate({
-        experimentId,
+        experiment_id: experimentId,
         ...config
       });
       

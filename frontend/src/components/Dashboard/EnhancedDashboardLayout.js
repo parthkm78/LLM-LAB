@@ -84,18 +84,18 @@ const EnhancedDashboardLayout = () => {
   };
 
   return (
-    <div className="h-screen bg-gray-50 flex overflow-hidden">
+    <div className="h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 flex overflow-hidden">
       {/* Mobile Sidebar Overlay */}
       {mobileSidebarOpen && (
         <div className="fixed inset-0 z-40 lg:hidden">
-          <div className="fixed inset-0 bg-gray-600 bg-opacity-75" onClick={() => setMobileSidebarOpen(false)} />
-          <div className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white">
+          <div className="fixed inset-0 bg-gray-900/50 backdrop-blur-sm" onClick={() => setMobileSidebarOpen(false)} />
+          <div className="relative flex-1 flex flex-col max-w-xs w-full pt-5 pb-4 bg-white/95 backdrop-blur-sm border-r border-white/20">
             <div className="absolute top-0 right-0 -mr-12 pt-2">
               <button
-                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+                className="ml-1 flex items-center justify-center h-10 w-10 rounded-full bg-white/20 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-white/50 transition-all duration-200 hover:bg-white/30"
                 onClick={() => setMobileSidebarOpen(false)}
               >
-                <XMarkIcon className="h-6 w-6 text-white" />
+                <XMarkIcon className="h-5 w-5 text-white" />
               </button>
             </div>
             <DashboardSidebar 
@@ -124,7 +124,7 @@ const EnhancedDashboardLayout = () => {
         {/* Mobile menu button - positioned as floating button */}
         <button
           onClick={() => setMobileSidebarOpen(true)}
-          className="lg:hidden fixed top-4 left-4 z-30 p-2 rounded-lg bg-white shadow-lg border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+          className="lg:hidden fixed top-4 left-4 z-30 p-2.5 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20 text-gray-700 hover:text-blue-600 hover:bg-white transition-all duration-200 hover:scale-105"
         >
           <Bars3Icon className="h-5 w-5" />
         </button>
@@ -132,13 +132,13 @@ const EnhancedDashboardLayout = () => {
         {/* Desktop sidebar toggle - positioned as floating button */}
         <button
           onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="hidden lg:block fixed top-4 left-4 z-30 p-2 rounded-lg bg-white shadow-lg border border-gray-200 text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+          className="hidden lg:block fixed top-4 left-4 z-30 p-2.5 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20 text-gray-700 hover:text-blue-600 hover:bg-white transition-all duration-200 hover:scale-105"
         >
           <Bars3Icon className="h-4 w-4" />
         </button>
 
         {/* Main Content Area - Full Height */}
-        <main className="flex-1 overflow-auto bg-gray-50">
+        <main className="flex-1 overflow-auto">
           <div className="h-full">
             {renderActiveSection()}
           </div>

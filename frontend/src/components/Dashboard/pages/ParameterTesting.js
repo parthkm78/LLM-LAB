@@ -11,6 +11,25 @@ import {
   DocumentTextIcon,
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
+import { 
+  BarChart, 
+  Bar, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer,
+  RadarChart,
+  PolarGrid,
+  PolarAngleAxis,
+  PolarRadiusAxis,
+  Radar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
+  Cell
+} from 'recharts';
 import { designTokens, getParameterColor } from '../../../styles/designTokens';
 import { useExperiments, useQualityMetrics } from '../../../hooks/useExperiments';
 import { useNotifications } from '../../../contexts/NotificationContext';
@@ -170,27 +189,56 @@ const ParameterTesting = () => {
       setLastExperiment(experiment);
       
       // Generate response
-      const response = await generateResponses(experiment.id, {
-        model: currentParameters.model,
-        parameters: currentParameters
+      const responseData = await generateResponses(experiment.id, {
+        experiment_id: experiment.id,
+        specific_parameters: currentParameters
       });
       
-      if (response.content) {
-        setGeneratedResponse(response.content);
+      console.log('Response data structure:', responseData);
+      
+      if (responseData.results && responseData.results.length > 0) {
+        const response = responseData.results[0]; // Get first response
+        
+        // Ensure we have a string content
+        const content = typeof response.content === 'string' 
+          ? response.content 
+          : JSON.stringify(response.content || response);
+          
+        setGeneratedResponse(content);
         success('Response generated successfully!');
         
-        // Calculate quality metrics
-        try {
-          const metrics = await calculateMetrics(response.id);
-          setResponseMetrics(metrics);
-        } catch (metricsError) {
-          console.warn('Failed to calculate metrics:', metricsError);
-          // Continue without metrics - this is not critical
+        // Use the metrics from the response if available
+        if (response.metrics) {
+          setResponseMetrics(response.metrics);
+        } else {
+          // Calculate quality metrics if not already calculated
+          try {
+            const metrics = await calculateMetrics(response.id);
+            setResponseMetrics(metrics);
+          } catch (metricsError) {
+            console.warn('Failed to calculate metrics:', metricsError);
+            // Continue without metrics - this is not critical
+          }
         }
       }
       
     } catch (err) {
-      showError(err.message || 'Failed to generate response');
+      // Handle different error structures
+      let errorMessage = 'Failed to generate response';
+      
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object') {
+        if (err.message && typeof err.message === 'string') {
+          errorMessage = err.message;
+        } else if (err.error && typeof err.error === 'string') {
+          errorMessage = err.error;
+        } else if (err.statusCode) {
+          errorMessage = `Error ${err.statusCode}: ${err.message || 'Request failed'}`;
+        }
+      }
+      
+      showError(errorMessage);
       console.error('Generate response error:', err);
     } finally {
       setIsGenerating(false);
@@ -198,40 +246,46 @@ const ParameterTesting = () => {
   };
 
   const ParameterSlider = ({ paramKey, parameter }) => (
-    <div className="bg-white rounded-xl border border-gray-200 p-6">
-      <div className="flex items-center justify-between mb-4">
-        <div>
-          <h3 className="text-lg font-semibold text-gray-900">{parameter.name}</h3>
-          <p className="text-sm text-gray-600 mt-1">{parameter.description}</p>
-        </div>
-        <div className="text-right">
-          <div className="text-2xl font-bold" style={{ color: getParameterColor(parameter.personality) }}>
-            {currentParameters[paramKey]}
-          </div>
-          <div className="text-xs text-gray-500 uppercase tracking-wider">
+    <div className="bg-white rounded-lg border border-gray-200 p-2.5 shadow-sm hover:shadow-md transition-all duration-200">
+      <div className="flex items-center justify-between mb-1.5">
+        <div className="flex-1 min-w-0">
+          <h4 className="text-xs font-bold text-gray-900 truncate">{parameter.name}</h4>
+          <div className="text-xs font-medium text-gray-500 uppercase tracking-wider bg-gray-100 px-1 py-0.5 rounded-md inline-block">
             {parameter.personality}
+          </div>
+        </div>
+        <div className="text-right ml-2 flex-shrink-0">
+          <div className="text-sm font-black bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            {currentParameters[paramKey]}
           </div>
         </div>
       </div>
       
-      <div className="space-y-4">
-        <input
-          type="range"
-          min={parameter.min}
-          max={parameter.max}
-          step={parameter.step}
-          value={currentParameters[paramKey]}
-          onChange={(e) => updateParameter(paramKey, parseFloat(e.target.value))}
-          className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider"
-          style={{
-            background: `linear-gradient(to right, ${getParameterColor(parameter.personality)} 0%, ${getParameterColor(parameter.personality)} ${((currentParameters[paramKey] - parameter.min) / (parameter.max - parameter.min)) * 100}%, #e2e8f0 ${((currentParameters[paramKey] - parameter.min) / (parameter.max - parameter.min)) * 100}%, #e2e8f0 100%)`
-          }}
-        />
-        <div className="flex justify-between text-xs text-gray-500">
-          <span>{parameter.min}</span>
-          <span>{parameter.max}</span>
+      <div className="space-y-1.5">
+        <div className="relative">
+          <input
+            type="range"
+            min={parameter.min}
+            max={parameter.max}
+            step={parameter.step}
+            value={currentParameters[paramKey]}
+            onChange={(e) => updateParameter(paramKey, parseFloat(e.target.value))}
+            className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer slider shadow-inner"
+            style={{
+              background: `linear-gradient(to right, ${getParameterColor(parameter.personality)} 0%, ${getParameterColor(parameter.personality)} ${((currentParameters[paramKey] - parameter.min) / (parameter.max - parameter.min)) * 100}%, #e2e8f0 ${((currentParameters[paramKey] - parameter.min) / (parameter.max - parameter.min)) * 100}%, #e2e8f0 100%)`
+            }}
+          />
+          <div 
+            className="absolute top-0 w-4 h-4 rounded-full shadow-lg border-2 border-white transform -translate-y-1 -translate-x-2 transition-all duration-150 hover:scale-110 cursor-pointer"
+            style={{
+              left: `${((currentParameters[paramKey] - parameter.min) / (parameter.max - parameter.min)) * 100}%`,
+              backgroundColor: getParameterColor(parameter.personality),
+              boxShadow: `0 2px 8px rgba(0,0,0,0.15), 0 0 0 3px ${getParameterColor(parameter.personality)}20`
+            }}
+          />
         </div>
       </div>
+      <p className="text-xs text-gray-600 mt-1.5 leading-tight line-clamp-2">{parameter.description}</p>
     </div>
   );
 
@@ -242,33 +296,38 @@ const ParameterTesting = () => {
     return (
       <button
         onClick={() => applyPreset(preset)}
-        className={`w-full text-left p-6 rounded-xl border-2 transition-all duration-300 ${
+        className={`group w-full text-left p-3 rounded-xl border-2 transition-all duration-300 transform hover:scale-102 ${
           isActive 
-            ? 'border-blue-500 bg-blue-50 shadow-lg' 
-            : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md'
+            ? 'border-blue-500 bg-gradient-to-br from-blue-50 to-indigo-50 shadow-lg ring-2 ring-blue-200' 
+            : 'border-gray-200 bg-white hover:border-blue-300 hover:shadow-md hover:bg-gray-50'
         }`}
       >
-        <div className="flex items-start space-x-4">
-          <div className={`w-12 h-12 bg-gradient-to-br ${preset.color} rounded-xl flex items-center justify-center flex-shrink-0`}>
-            <Icon className="w-6 h-6 text-white" />
+        <div className="flex items-start space-x-3">
+          <div className={`w-10 h-10 bg-gradient-to-br ${preset.color} rounded-lg flex items-center justify-center flex-shrink-0 shadow-sm group-hover:shadow-md transition-shadow duration-200`}>
+            <Icon className="w-5 h-5 text-white" />
           </div>
-          <div className="flex-1">
-            <h3 className={`text-lg font-semibold ${isActive ? 'text-blue-900' : 'text-gray-900'}`}>
+          <div className="flex-1 min-w-0">
+            <h3 className={`text-sm font-bold ${isActive ? 'text-blue-900' : 'text-gray-900'} truncate`}>
               {preset.name}
             </h3>
-            <p className={`text-sm mt-1 ${isActive ? 'text-blue-700' : 'text-gray-600'}`}>
+            <p className={`text-xs mt-1 ${isActive ? 'text-blue-700' : 'text-gray-600'} line-clamp-2 leading-relaxed`}>
               {preset.description}
             </p>
-            <div className="flex items-center space-x-3 mt-3 text-xs">
-              <span className="text-gray-500">Temp: {preset.parameters.temperature}</span>
-              <span className="text-gray-500">Top-p: {preset.parameters.top_p}</span>
-              <span className="text-gray-500">Tokens: {preset.parameters.max_tokens}</span>
+            <div className="flex items-center space-x-3 mt-2">
+              <div className="flex items-center space-x-1 bg-gray-100 rounded-full px-2 py-1">
+                <span className="text-xs font-medium text-gray-700">T:</span>
+                <span className="text-xs font-bold text-gray-900">{preset.parameters.temperature}</span>
+              </div>
+              <div className="flex items-center space-x-1 bg-gray-100 rounded-full px-2 py-1">
+                <span className="text-xs font-medium text-gray-700">P:</span>
+                <span className="text-xs font-bold text-gray-900">{preset.parameters.top_p}</span>
+              </div>
             </div>
           </div>
           {isActive && (
             <div className="flex-shrink-0">
-              <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                <div className="w-3 h-3 bg-white rounded-full"></div>
+              <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center shadow-sm">
+                <div className="w-2.5 h-2.5 bg-white rounded-full"></div>
               </div>
             </div>
           )}
@@ -278,182 +337,329 @@ const ParameterTesting = () => {
   };
 
   return (
-    <div className="p-6 space-y-8">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Parameter Testing</h1>
-          <p className="text-gray-600 mt-2">Configure and test LLM parameters for optimal response quality</p>
-        </div>
-        <div className="flex items-center space-x-3">
-          <button className="flex items-center space-x-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors">
-            <BookOpenIcon className="w-4 h-4" />
-            <span>Parameter Guide</span>
-          </button>
-          <button className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
-            <ArrowPathIcon className="w-4 h-4" />
-            <span>Reset to Defaults</span>
-          </button>
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+      {/* Hero Section */}
+      <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white">
+        <div className="px-6 py-8">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold tracking-tight text-white">Parameter Testing Lab</h1>
+              <p className="text-white/80 mt-2 text-lg">Fine-tune AI parameters for optimal performance</p>
+              <div className="flex items-center space-x-4 mt-4">
+                <div className="flex items-center space-x-2 bg-white/15 rounded-full px-3 py-1">
+                  <div className="w-2 h-2 bg-green-300 rounded-full animate-pulse"></div>
+                  <span className="text-sm font-medium text-white">Live Testing</span>
+                </div>
+                <div className="flex items-center space-x-2 bg-white/15 rounded-full px-3 py-1">
+                  <SparklesIcon className="w-4 h-4 text-white" />
+                  <span className="text-sm font-medium text-white">AI Powered</span>
+                </div>
+              </div>
+            </div>
+            <div className="hidden md:flex items-center space-x-3">
+              <button className="flex items-center space-x-2 px-4 py-2 bg-white/15 hover:bg-white/25 rounded-lg transition-all duration-200 backdrop-blur-sm">
+                <BookOpenIcon className="w-4 h-4 text-white" />
+                <span className="font-medium text-white">Guide</span>
+              </button>
+              <button className="flex items-center space-x-2 px-4 py-2 bg-white text-blue-600 hover:bg-blue-50 rounded-lg transition-all duration-200 font-medium shadow-lg">
+                <ArrowPathIcon className="w-4 h-4" />
+                <span>Reset All</span>
+              </button>
+            </div>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column - Presets */}
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Parameter Presets</h2>
-            <div className="space-y-3">
-              {parameterPresets.map((preset) => (
-                <PresetCard key={preset.id} preset={preset} />
-              ))}
+      <div className="px-6 py-6 space-y-6">
+
+        {/* Row 1: Parameter Presets */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl p-5">
+          <div className="flex items-center space-x-2 mb-4">
+            <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+              <AdjustmentsHorizontalIcon className="w-5 h-5 text-white" />
+            </div>
+            <h2 className="text-lg font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Parameter Presets
+            </h2>
+          </div>
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
+            {parameterPresets.map((preset) => (
+              <PresetCard key={preset.id} preset={preset} />
+            ))}
+          </div>
+        </div>
+
+        {/* Row 2: Model Selection & Parameter Controls */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-white/20 shadow-xl p-4">
+          <div className="flex items-center space-x-2 mb-3">
+            <div className="w-6 h-6 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
+              <AdjustmentsHorizontalIcon className="w-4 h-4 text-white" />
+            </div>
+            <h2 className="text-base font-bold bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              Model Selection & Parameter Controls
+            </h2>
+          </div>
+          
+          {/* Model Selection and Configuration Row */}
+          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg border border-blue-200 p-3 mb-3">
+            <div className="grid grid-cols-1 lg:grid-cols-4 gap-3">
+              {/* Model Selection */}
+              <div className="bg-white rounded-md border border-gray-200 p-3 shadow-sm">
+                <div className="flex items-center space-x-2 mb-2">
+                  <CpuChipIcon className="w-3 h-3 text-blue-600" />
+                  <h3 className="text-xs font-bold text-gray-900">Model</h3>
+                </div>
+                <select 
+                  value={currentParameters.model}
+                  onChange={(e) => updateParameter('model', e.target.value)}
+                  className="w-full px-2 py-1.5 text-xs font-medium border border-gray-300 rounded-md focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white transition-all duration-200"
+                >
+                  <option value="gpt-4">GPT-4</option>
+                  <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                  <option value="claude-3">Claude-3</option>
+                  <option value="gemini-pro">Gemini Pro</option>
+                </select>
+              </div>
+
+              {/* Current Configuration Summary */}
+              <div className="lg:col-span-3 bg-white rounded-md border border-gray-200 p-3 shadow-sm">
+                <div className="flex items-center space-x-2 mb-2">
+                  <DocumentTextIcon className="w-3 h-3 text-emerald-600" />
+                  <h3 className="text-xs font-bold text-gray-900">Current Configuration</h3>
+                </div>
+                <div className="grid grid-cols-3 lg:grid-cols-6 gap-1.5 text-xs">
+                  {Object.entries(currentParameters).map(([key, value]) => (
+                    <div key={key} className="bg-gray-50 rounded-md px-2 py-1 text-center border">
+                      <div className="font-medium text-gray-600 text-xs truncate">
+                        {key.replace('_', ' ').replace('max tokens', 'tokens').replace('frequency penalty', 'freq').replace('presence penalty', 'pres')}
+                      </div>
+                      <div className="font-bold text-gray-900 text-xs">
+                        {typeof value === 'number' ? value.toFixed(key === 'max_tokens' ? 0 : 1) : value.substring(0, 6)}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Model Selection */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Model Selection</h3>
-            <select 
-              value={currentParameters.model}
-              onChange={(e) => updateParameter('model', e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="gpt-4">GPT-4</option>
-              <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
-              <option value="claude-3">Claude-3</option>
-              <option value="gemini-pro">Gemini Pro</option>
-            </select>
+          {/* Parameter Controls */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3">
+            {Object.entries(parameterInfo).map(([key, param]) => (
+              <ParameterSlider key={key} paramKey={key} parameter={param} />
+            ))}
           </div>
         </div>
 
-        {/* Middle Column - Parameter Controls */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold text-gray-900">Parameter Controls</h2>
-          {Object.entries(parameterInfo).map(([key, param]) => (
-            <ParameterSlider key={key} paramKey={key} parameter={param} />
-          ))}
+        {/* Row 3: Test Prompt */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-xl border border-white/20 shadow-lg p-5">
+          <div className="flex items-center space-x-2 mb-3">
+            <div className="w-6 h-6 bg-gradient-to-r from-violet-500 to-purple-500 rounded-md flex items-center justify-center">
+              <DocumentTextIcon className="w-4 h-4 text-white" />
+            </div>
+            <h3 className="text-base font-bold text-gray-900">Test Prompt</h3>
+          </div>
+          <textarea
+            value={testPrompt}
+            onChange={(e) => setTestPrompt(e.target.value)}
+            placeholder="Enter your test prompt here... (e.g., 'Write a creative story about AI')"
+            className="w-full h-28 px-4 py-3 text-sm font-medium border-2 border-gray-200 rounded-lg resize-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 bg-white shadow-sm transition-all duration-200 placeholder-gray-400"
+          />
         </div>
 
-        {/* Right Column - Test Interface */}
-        <div className="space-y-6">
-          <h2 className="text-xl font-bold text-gray-900">Test Interface</h2>
-          
-          {/* Test Prompt */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Test Prompt</h3>
-            <textarea
-              value={testPrompt}
-              onChange={(e) => setTestPrompt(e.target.value)}
-              placeholder="Enter your test prompt here..."
-              className="w-full h-32 px-4 py-3 border border-gray-300 rounded-lg resize-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-            />
-            <button
-              onClick={generateResponse}
-              disabled={!testPrompt.trim() || isGenerating || experimentsLoading}
-              className="w-full mt-4 flex items-center justify-center space-x-2 px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
+        {/* Row 4: Generate Button */}
+        <div className="flex justify-center">
+          <button
+            onClick={generateResponse}
+            disabled={!testPrompt.trim() || isGenerating || experimentsLoading}
+            className="group relative px-10 py-4 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 text-white text-base font-bold rounded-xl hover:from-blue-700 hover:via-purple-700 hover:to-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300 shadow-xl hover:shadow-2xl transform hover:scale-105 flex items-center space-x-3"
+          >
+            <div className="absolute inset-0 bg-gradient-to-r from-blue-400 via-purple-400 to-indigo-400 rounded-xl blur-lg opacity-30 group-hover:opacity-50 transition-opacity duration-300"></div>
+            <div className="relative flex items-center space-x-3">
               {(isGenerating || experimentsLoading) ? (
                 <>
                   <ArrowPathIcon className="w-5 h-5 animate-spin" />
-                  <span>Generating...</span>
+                  <span>Generating Magic...</span>
                 </>
               ) : (
                 <>
                   <PlayIcon className="w-5 h-5" />
                   <span>Generate Response</span>
+                  <SparklesIcon className="w-4 h-4 opacity-70" />
                 </>
               )}
-            </button>
+            </div>
+          </button>
+        </div>
+
+      {/* Row 5: Results Section */}
+      {generatedResponse && (
+        <div className="space-y-3">
+          {/* Generated Response */}
+          <div className="bg-white rounded-lg border border-gray-200 p-3">
+            <h3 className="text-sm font-semibold text-gray-900 mb-2">Generated Response</h3>
+            <div className="bg-gray-50 rounded-md p-3 text-sm text-gray-700 mb-3 max-h-48 overflow-y-auto">
+              {generatedResponse}
+            </div>
+            
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <button 
+                onClick={async () => {
+                  if (lastExperiment && !responseMetrics) {
+                    try {
+                      const metrics = await calculateMetrics(lastExperiment.id);
+                      setResponseMetrics(metrics);
+                      success('Quality metrics calculated!');
+                    } catch (err) {
+                      showError('Failed to calculate quality metrics');
+                    }
+                  }
+                }}
+                disabled={metricsLoading || !!responseMetrics}
+                className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition-colors disabled:opacity-50"
+              >
+                <ChartBarIcon className="w-3 h-3" />
+                <span>{responseMetrics ? 'Analyzed' : 'Analyze Quality'}</span>
+              </button>
+              <button 
+                onClick={() => {
+                  if (lastExperiment) {
+                    success('Experiment saved!');
+                  }
+                }}
+                className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
+              >
+                <DocumentTextIcon className="w-3 h-3" />
+                <span>Save Result</span>
+              </button>
+            </div>
           </div>
 
-          {/* Generated Response */}
-          {generatedResponse && (
-            <div className="bg-white rounded-xl border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Generated Response</h3>
-              <div className="bg-gray-50 rounded-lg p-4 text-gray-700 mb-4">
-                {generatedResponse}
-              </div>
-              
-              {/* Quality Metrics */}
-              {responseMetrics && (
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 p-4 bg-blue-50 rounded-lg">
+          {/* Quality Metrics */}
+          {responseMetrics && (
+            <div className="bg-white rounded-lg border border-gray-200 p-3">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Quality Analysis</h3>
+              <div className="space-y-3">
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-4 gap-2 p-2 bg-blue-50 rounded-md">
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-blue-600">
-                      {responseMetrics.quality || 'N/A'}%
+                    <div className="text-lg font-bold text-blue-600">
+                      {typeof responseMetrics.quality === 'number' ? Math.round(responseMetrics.quality) : 'N/A'}%
                     </div>
-                    <div className="text-xs text-gray-600">Overall Quality</div>
+                    <div className="text-xs text-gray-600">Quality</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-purple-600">
-                      {responseMetrics.creativity || 'N/A'}%
+                    <div className="text-lg font-bold text-purple-600">
+                      {typeof responseMetrics.creativity === 'number' ? Math.round(responseMetrics.creativity) : 'N/A'}%
                     </div>
                     <div className="text-xs text-gray-600">Creativity</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-emerald-600">
-                      {responseMetrics.coherence || 'N/A'}%
+                    <div className="text-lg font-bold text-emerald-600">
+                      {typeof responseMetrics.coherence === 'number' ? Math.round(responseMetrics.coherence) : 'N/A'}%
                     </div>
                     <div className="text-xs text-gray-600">Coherence</div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold text-amber-600">
-                      {responseMetrics.readability || 'N/A'}%
+                    <div className="text-lg font-bold text-amber-600">
+                      {typeof responseMetrics.readability === 'number' ? Math.round(responseMetrics.readability) : 'N/A'}%
                     </div>
                     <div className="text-xs text-gray-600">Readability</div>
                   </div>
                 </div>
-              )}
-              
-              <div className="flex items-center justify-between pt-4 border-t border-gray-100">
-                <button 
-                  onClick={async () => {
-                    if (lastExperiment && !responseMetrics) {
-                      try {
-                        const metrics = await calculateMetrics(lastExperiment.id);
-                        setResponseMetrics(metrics);
-                        success('Quality metrics calculated!');
-                      } catch (err) {
-                        showError('Failed to calculate quality metrics');
-                      }
-                    }
-                  }}
-                  disabled={metricsLoading || !!responseMetrics}
-                  className="flex items-center space-x-2 px-4 py-2 bg-emerald-100 text-emerald-700 rounded-lg hover:bg-emerald-200 transition-colors disabled:opacity-50"
-                >
-                  <ChartBarIcon className="w-4 h-4" />
-                  <span>{responseMetrics ? 'Quality Analyzed' : 'Analyze Quality'}</span>
-                </button>
-                <button 
-                  onClick={() => {
-                    if (lastExperiment) {
-                      success('Experiment saved to history!');
-                    }
-                  }}
-                  className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors"
-                >
-                  <DocumentTextIcon className="w-4 h-4" />
-                  <span>Save Result</span>
-                </button>
+
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {/* Bar Chart */}
+                  <div className="bg-gray-50 rounded-md p-2">
+                    <h4 className="text-xs font-semibold text-gray-700 mb-1">Metrics Overview</h4>
+                    <ResponsiveContainer width="100%" height={150}>
+                      <BarChart
+                        data={[
+                          { 
+                            metric: 'Quality', 
+                            value: typeof responseMetrics.quality === 'number' ? Math.round(responseMetrics.quality) : 0, 
+                            color: '#3B82F6' 
+                          },
+                          { 
+                            metric: 'Creativity', 
+                            value: typeof responseMetrics.creativity === 'number' ? Math.round(responseMetrics.creativity) : 0, 
+                            color: '#8B5CF6' 
+                          },
+                          { 
+                            metric: 'Coherence', 
+                            value: typeof responseMetrics.coherence === 'number' ? Math.round(responseMetrics.coherence) : 0, 
+                            color: '#10B981' 
+                          },
+                          { 
+                            metric: 'Readability', 
+                            value: typeof responseMetrics.readability === 'number' ? Math.round(responseMetrics.readability) : 0, 
+                            color: '#F59E0B' 
+                          }
+                        ]}
+                        margin={{ top: 5, right: 15, left: 10, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="metric" tick={{ fontSize: 10 }} />
+                        <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
+                        <Tooltip 
+                          formatter={(value) => [`${value}%`, 'Score']}
+                          labelStyle={{ color: '#374151', fontSize: '12px' }}
+                        />
+                        <Bar dataKey="value" fill="#3B82F6" radius={[2, 2, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Radar Chart */}
+                  <div className="bg-gray-50 rounded-md p-2">
+                    <h4 className="text-xs font-semibold text-gray-700 mb-1">Performance Radar</h4>
+                    <ResponsiveContainer width="100%" height={150}>
+                      <RadarChart
+                        data={[
+                          { 
+                            metric: 'Quality', 
+                            value: typeof responseMetrics.quality === 'number' ? Math.round(responseMetrics.quality) : 0 
+                          },
+                          { 
+                            metric: 'Creativity', 
+                            value: typeof responseMetrics.creativity === 'number' ? Math.round(responseMetrics.creativity) : 0 
+                          },
+                          { 
+                            metric: 'Coherence', 
+                            value: typeof responseMetrics.coherence === 'number' ? Math.round(responseMetrics.coherence) : 0 
+                          },
+                          { 
+                            metric: 'Readability', 
+                            value: typeof responseMetrics.readability === 'number' ? Math.round(responseMetrics.readability) : 0 
+                          }
+                        ]}
+                        margin={{ top: 10, right: 40, bottom: 10, left: 40 }}
+                      >
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10 }} />
+                        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} />
+                        <Radar
+                          name="Metrics"
+                          dataKey="value"
+                          stroke="#3B82F6"
+                          fill="#3B82F6"
+                          fillOpacity={0.3}
+                          strokeWidth={2}
+                        />
+                        <Tooltip 
+                          formatter={(value) => [`${value}%`, 'Score']}
+                          labelStyle={{ color: '#374151', fontSize: '12px' }}
+                        />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
             </div>
           )}
-
-          {/* Parameter Summary */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Current Configuration</h3>
-            <div className="space-y-3">
-              {Object.entries(currentParameters).map(([key, value]) => (
-                <div key={key} className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600 capitalize">
-                    {key.replace('_', ' ')}
-                  </span>
-                  <span className="text-sm font-semibold text-gray-900">
-                    {typeof value === 'number' ? value.toFixed(key === 'max_tokens' ? 0 : 2) : value}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
+      )}
       </div>
     </div>
   );
