@@ -131,60 +131,112 @@ const DashboardOverview = ({ section = 'overview' }) => {
   }
 
   return (
-    <div className="p-6 space-y-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-full">
-      {/* Header Stats Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <CompactStatCard
-          title="Total Experiments"
-          value={quickStats.totalExperiments.toLocaleString()}
-          icon={BeakerIcon}
-          trend="up"
-          trendValue="+8.2%"
-          color="blue"
-          size="large"
-        />
-        <CompactStatCard
-          title="Avg Quality"
-          value={`${quickStats.avgQualityScore}%`}
-          icon={TrophyIcon}
-          trend="up"
-          trendValue="+2.1%"
-          color="emerald"
-          size="large"
-        />
-        <CompactStatCard
-          title="Today"
-          value={quickStats.experimentsToday}
-          subtitle="experiments"
-          icon={ClockIcon}
-          trend="up"
-          trendValue="+15%"
-          color="purple"
-        />
-        <CompactStatCard
-          title="Success Rate"
-          value={`${quickStats.successRate}%`}
-          icon={SparklesIcon}
-          trend="up"
-          trendValue="+1.8%"
-          color="indigo"
-        />
-        <CompactStatCard
-          title="Responses"
-          value={quickStats.responseAnalyzed.toLocaleString()}
-          subtitle="analyzed"
-          icon={DocumentTextIcon}
-          color="orange"
-        />
-        <CompactStatCard
-          title="Avg Time"
-          value={`${quickStats.avgResponseTime}s`}
-          icon={BoltIcon}
-          trend="down"
-          trendValue="-0.3s"
-          color="cyan"
-        />
+    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-full">
+      {/* Compact Hero Section */}
+      <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white">
+        <div className="px-6 py-5">
+          <div className="max-w-7xl mx-auto">
+            {/* Compact Hero Header */}
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-5">
+              <div className="mb-4 md:mb-0">
+                <div className="inline-flex items-center px-2.5 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-medium mb-2">
+                  <SparklesIcon className="w-3 h-3 mr-1" />
+                  LLM Analysis Dashboard
+                </div>
+                <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-white mb-1">
+                  Dashboard Overview
+                </h1>
+                <p className="text-white/80 text-sm">
+                  Monitor experiments and track performance metrics
+                </p>
+              </div>
+              
+              {/* Quick Actions in Header */}
+              <div className="flex flex-wrap gap-2">
+                <button className="group bg-white/15 backdrop-blur-sm border border-white/20 text-white rounded-lg px-3 py-2 hover:bg-white/25 transition-all duration-300 text-xs font-medium shadow-md hover:shadow-lg transform hover:scale-105">
+                  <div className="flex items-center space-x-1.5">
+                    <PlayIcon className="w-4 h-4" />
+                    <span>New Experiment</span>
+                  </div>
+                </button>
+                <button className="group bg-white/15 backdrop-blur-sm border border-white/20 text-white rounded-lg px-3 py-2 hover:bg-white/25 transition-all duration-300 text-xs font-medium shadow-md hover:shadow-lg transform hover:scale-105">
+                  <div className="flex items-center space-x-1.5">
+                    <ChartBarIcon className="w-4 h-4" />
+                    <span>Batch Analysis</span>
+                  </div>
+                </button>
+              </div>
+            </div>
+
+            {/* Compact Hero Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-3 text-center">
+                <div className="text-xl font-black text-white mb-0.5">{quickStats.totalExperiments.toLocaleString()}</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Total Experiments</div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-3 text-center">
+                <div className="text-xl font-black text-white mb-0.5">{quickStats.avgQualityScore}%</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Avg Quality</div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-3 text-center">
+                <div className="text-xl font-black text-white mb-0.5">{quickStats.successRate}%</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Success Rate</div>
+              </div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-3 text-center">
+                <div className="text-xl font-black text-white mb-0.5">{quickStats.experimentsToday}</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Today</div>
+              </div>
+          </div>
+        </div>
       </div>
+
+      <div className="p-6 space-y-6">
+        {/* Detailed Stats Grid */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+          <CompactStatCard
+            title="Responses"
+            value={quickStats.responseAnalyzed.toLocaleString()}
+            subtitle="analyzed"
+            icon={DocumentTextIcon}
+            color="orange"
+          />
+          <CompactStatCard
+            title="Avg Time"
+            value={`${quickStats.avgResponseTime}s`}
+            icon={BoltIcon}
+            trend="down"
+            trendValue="-0.3s"
+            color="cyan"
+          />
+          <CompactStatCard
+            title="Best Quality"
+            value={`${quickStats.bestQuality}%`}
+            icon={TrophyIcon}
+            trend="up"
+            trendValue="+2.1%"
+            color="emerald"
+          />
+          <CompactStatCard
+            title="Improvement"
+            value={`+${quickStats.improvementRate}%`}
+            icon={ArrowTrendingUpIcon}
+            trend="up"
+            trendValue="+1.2%"
+            color="purple"
+          />
+          <CompactStatCard
+            title="Total Cost"
+            value={`$${quickStats.totalCost}`}
+            icon={CpuChipIcon}
+            color="indigo"
+          />
+          <CompactStatCard
+            title="Active Models"
+            value={quickStats.activeModels}
+            icon={BeakerIcon}
+            color="pink"
+          />
+        </div>
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -324,40 +376,8 @@ const DashboardOverview = ({ section = 'overview' }) => {
           </div>
         </div>
       </div>
+      </div>
 
-      {/* Quick Actions */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <button className="group bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl p-4 hover:from-blue-600 hover:to-purple-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl transform hover:scale-105">
-          <div className="flex items-center space-x-3">
-            <PlayIcon className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
-            <span className="font-bold">New Experiment</span>
-          </div>
-          <p className="text-blue-100 text-xs mt-2 font-medium">Start parameter testing</p>
-        </button>
-        
-        <button className="group bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl p-4 hover:from-purple-600 hover:to-pink-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl transform hover:scale-105">
-          <div className="flex items-center space-x-3">
-            <ChartBarIcon className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
-            <span className="font-bold">Batch Analysis</span>
-          </div>
-          <p className="text-purple-100 text-xs mt-2 font-medium">Run multiple tests</p>
-        </button>
-        
-        <button className="group bg-gradient-to-r from-emerald-500 to-teal-500 text-white rounded-xl p-4 hover:from-emerald-600 hover:to-teal-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl transform hover:scale-105">
-          <div className="flex items-center space-x-3">
-            <ChartPieIcon className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
-            <span className="font-bold">Quality Metrics</span>
-          </div>
-          <p className="text-emerald-100 text-xs mt-2 font-medium">Analyze results</p>
-        </button>
-        
-        <button className="group bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl p-4 hover:from-orange-600 hover:to-red-600 transition-all duration-300 text-left shadow-lg hover:shadow-xl transform hover:scale-105">
-          <div className="flex items-center space-x-3">
-            <DocumentTextIcon className="w-6 h-6 group-hover:scale-110 transition-transform duration-200" />
-            <span className="font-bold">Compare Results</span>
-          </div>
-          <p className="text-orange-100 text-xs mt-2 font-medium">Side-by-side analysis</p>
-        </button>
       </div>
     </div>
   );
