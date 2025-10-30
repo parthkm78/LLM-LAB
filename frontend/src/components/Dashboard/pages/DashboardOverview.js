@@ -189,7 +189,7 @@ const DashboardOverview = ({ section = 'overview' }) => {
           </div>
         </div>
       </div>
-
+ </div>
       <div className="p-6 space-y-6">
         {/* Detailed Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
@@ -378,7 +378,7 @@ const DashboardOverview = ({ section = 'overview' }) => {
       </div>
       </div>
 
-      </div>
+     
     </div>
   );
 };

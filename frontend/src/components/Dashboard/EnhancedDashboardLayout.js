@@ -116,6 +116,7 @@ const EnhancedDashboardLayout = () => {
           activeSection={activeSection} 
           onSectionChange={setActiveSection}
           isCollapsed={sidebarCollapsed}
+          onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
         />
       </div>
 
@@ -127,14 +128,6 @@ const EnhancedDashboardLayout = () => {
           className="lg:hidden fixed top-4 left-4 z-30 p-2.5 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20 text-gray-700 hover:text-blue-600 hover:bg-white transition-all duration-200 hover:scale-105"
         >
           <Bars3Icon className="h-5 w-5" />
-        </button>
-
-        {/* Desktop sidebar toggle - positioned as floating button */}
-        <button
-          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-          className="hidden lg:block fixed top-4 left-4 z-30 p-2.5 rounded-xl bg-white/80 backdrop-blur-sm shadow-lg border border-white/20 text-gray-700 hover:text-blue-600 hover:bg-white transition-all duration-200 hover:scale-105"
-        >
-          <Bars3Icon className="h-4 w-4" />
         </button>
 
         {/* Main Content Area - Full Height */}

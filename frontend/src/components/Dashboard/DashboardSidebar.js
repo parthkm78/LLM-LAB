@@ -19,11 +19,13 @@ import {
   PresentationChartBarIcon,
   CircleStackIcon,
   UserIcon,
-  QuestionMarkCircleIcon
+  QuestionMarkCircleIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon
 } from '@heroicons/react/24/outline';
 import { designTokens } from '../../styles/designTokens';
 
-const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false }) => {
+const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false, onToggleCollapse }) => {
   const menuSections = [
     {
       title: 'Overview',
@@ -34,12 +36,12 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
           icon: HomeIcon,
           description: 'Main overview and quick stats'
         },
-        {
-          id: 'recent',
-          name: 'Recent Activity',
-          icon: ClockIcon,
-          description: 'Latest experiments and results'
-        }
+        // {
+        //   id: 'recent',
+        //   name: 'Recent Activity',
+        //   icon: ClockIcon,
+        //   description: 'Latest experiments and results'
+        // }
       ]
     },
     {
@@ -163,9 +165,21 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
   };
 
   return (
-    <div className={`h-full bg-white/80 backdrop-blur-sm border-r border-white/20 shadow-xl transition-all duration-300 overflow-x-auto ${
+    <div className={`h-full bg-white/80 backdrop-blur-sm border-r border-white/20 shadow-xl transition-all duration-300 relative ${
       isCollapsed ? 'w-16' : 'w-64'
     }`}>
+      {/* Collapse/Expand Button */}
+      <button
+        onClick={onToggleCollapse}
+        className="absolute -right-3 top-6 z-10 w-6 h-6 bg-white border border-gray-200 rounded-full shadow-lg hover:shadow-xl flex items-center justify-center text-gray-600 hover:text-blue-600 hover:bg-blue-50 transition-all duration-200 group"
+        title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
+      >
+        {isCollapsed ? (
+          <ChevronRightIcon className="w-3 h-3 group-hover:scale-110 transition-transform duration-200" />
+        ) : (
+          <ChevronLeftIcon className="w-3 h-3 group-hover:scale-110 transition-transform duration-200" />
+        )}
+      </button>
       {/* Header */}
       <div className="p-4 border-b border-white/20 flex-shrink-0">
         <div className="flex items-center space-x-3">
@@ -182,7 +196,7 @@ const DashboardSidebar = ({ activeSection, onSectionChange, isCollapsed = false 
       </div>
 
       {/* Navigation */}
-      <div className="flex-1 overflow-y-auto overflow-x-auto py-3 space-y-4"  style={{ maxHeight: 'calc(100vh - 200px)' }}>
+      <div className="flex-1 overflow-y-auto py-3 space-y-4"  style={{ maxHeight: 'calc(100vh - 200px)' }}>
         {menuSections.map((section, sectionIndex) => (
           <div key={sectionIndex} className="px-3 flex-shrink-0">
             {!isCollapsed && (
