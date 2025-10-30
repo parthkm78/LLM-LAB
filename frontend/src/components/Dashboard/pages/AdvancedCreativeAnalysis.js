@@ -344,11 +344,11 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
 
   // Advanced visualization components
   const ParameterOptimizationChart = () => (
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-6">
-      <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-6">
+    <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-blue-200/50 shadow-lg p-4">
+      <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
         Parameter Optimization Analysis
       </h3>
-      <ResponsiveContainer width="100%" height={350}>
+      <ResponsiveContainer width="100%" height={300}>
         <ComposedChart data={analysisData.advanced_analytics.parameter_analysis.temperature_impact}>
           <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
           <XAxis dataKey="range" stroke="#6B7280" fontSize={12} />
@@ -371,11 +371,11 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
   );
 
   const ThematicAnalysisRadar = () => (
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-6">
-      <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-6">
+    <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-blue-200/50 shadow-lg p-4">
+      <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
         Thematic Analysis Radar
       </h3>
-      <ResponsiveContainer width="100%" height={400}>
+      <ResponsiveContainer width="100%" height={320}>
         <RadarChart data={analysisData.advanced_analytics.thematic_patterns}>
           <PolarGrid stroke="#E5E7EB" />
           <PolarAngleAxis dataKey="theme" stroke="#6B7280" fontSize={11} />
@@ -411,11 +411,11 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
   );
 
   const EngagementPredictionChart = () => (
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-6">
-      <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-6">
+    <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-blue-200/50 shadow-lg p-4">
+      <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
         Reader Engagement Prediction Model
       </h3>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div>
           <h4 className="font-bold text-gray-800 mb-4">Engagement Factors (Weighted)</h4>
           <div className="space-y-3">
@@ -463,8 +463,8 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
     const [selectedStories, setSelectedStories] = useState([0, 1]);
     
     return (
-      <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-6">
-        <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-6">
+      <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-blue-200/50 shadow-lg p-4">
+        <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
           Story Comparison Matrix
         </h3>
         
@@ -510,16 +510,16 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
   };
 
   const LanguageSophisticationAnalysis = () => (
-    <div className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-6">
-      <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-6">
+    <div className="bg-white/90 backdrop-blur-sm rounded-xl border border-blue-200/50 shadow-lg p-4">
+      <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent mb-4">
         Language Sophistication Analysis
       </h3>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         {/* Vocabulary Distribution */}
         <div>
           <h4 className="font-bold text-gray-800 mb-4">Vocabulary Sophistication</h4>
-          <ResponsiveContainer width="100%" height={200}>
+          <ResponsiveContainer width="100%" height={180}>
             <PieChart>
               <Pie
                 data={analysisData.advanced_analytics.language_analysis.vocabulary_sophistication}
@@ -586,107 +586,107 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
   );
 
   return (
-    <div className="bg-gradient-to-br from-slate-50 via-purple-50 to-indigo-50 min-h-screen">
-      {/* Enhanced Header */}
-      <div className="bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 text-white">
-        <div className="px-6 py-8">
+    <div className="bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 min-h-screen">
+      {/* Compact Header */}
+      <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white">
+        <div className="px-4 py-4">
           <div className="max-w-7xl mx-auto">
-            <div className="flex items-center justify-between mb-6">
-              <div className="flex items-center space-x-4">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-3">
                 <button
                   onClick={onBack}
-                  className="flex items-center space-x-2 px-4 py-2 bg-white/20 hover:bg-white/30 rounded-xl transition-all duration-300 text-white border border-white/30 backdrop-blur-sm"
+                  className="flex items-center space-x-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-lg transition-all duration-200 text-white border border-white/30 backdrop-blur-sm"
                 >
-                  <ArrowLeftIcon className="w-5 h-5" />
-                  <span>Back to Metrics</span>
+                  <ArrowLeftIcon className="w-4 h-4" />
+                  <span className="text-sm">Back</span>
                 </button>
                 <div>
-                  <div className="inline-flex items-center px-4 py-2 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-sm font-medium mb-3">
-                    <SparklesIcon className="w-5 h-5 mr-2" />
-                    Advanced Creative Analysis Lab
+                  <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-medium mb-2">
+                    <SparklesIcon className="w-4 h-4 mr-1.5" />
+                    Creative Analysis Lab
                   </div>
-                  <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                    {analysisData.experiment.name}
+                  <h1 className="text-xl md:text-2xl font-bold text-white mb-1">
+                    Creative Writing Analysis
                   </h1>
-                  <p className="text-white/90 text-lg max-w-3xl">
-                    {analysisData.experiment.description}
+                  <p className="text-white/90 text-sm max-w-2xl">
+                    AI-powered analysis of creative content with advanced metrics
                   </p>
                 </div>
               </div>
 
               <div className="text-right">
-                <div className="text-3xl font-bold text-white mb-2">
-                  Advanced Analysis
+                <div className="text-lg font-bold text-white mb-1">
+                  Advanced
                 </div>
-                <div className="text-white/80 text-sm">
-                  Multi-dimensional creativity insights
+                <div className="text-white/80 text-xs">
+                  Multi-dimensional
                 </div>
               </div>
             </div>
 
-            {/* Dynamic Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-              <div className="bg-white/15 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-                <div className="text-2xl font-black text-white mb-1">8</div>
-                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Stories Analyzed</div>
+            {/* Compact Stats */}
+            <div className="grid grid-cols-5 gap-2">
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-2 text-center">
+                <div className="text-lg font-black text-white mb-0.5">8</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Stories</div>
               </div>
-              <div className="bg-white/15 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-                <div className="text-2xl font-black text-white mb-1">97%</div>
-                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Max Emotion</div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-2 text-center">
+                <div className="text-lg font-black text-white mb-0.5">97%</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Emotion</div>
               </div>
-              <div className="bg-white/15 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-                <div className="text-2xl font-black text-white mb-1">15</div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-2 text-center">
+                <div className="text-lg font-black text-white mb-0.5">15</div>
                 <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Metrics</div>
               </div>
-              <div className="bg-white/15 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-                <div className="text-2xl font-black text-white mb-1">94.2%</div>
-                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Best Quality</div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-2 text-center">
+                <div className="text-lg font-black text-white mb-0.5">94%</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Quality</div>
               </div>
-              <div className="bg-white/15 backdrop-blur-sm rounded-xl border border-white/20 p-4 text-center">
-                <div className="text-2xl font-black text-white mb-1">91.4%</div>
-                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Engagement</div>
+              <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-2 text-center">
+                <div className="text-lg font-black text-white mb-0.5">91%</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Engage</div>
               </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Navigation Tabs */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
-        <div className="flex items-center justify-center mb-8">
-          <div className="flex items-center space-x-2 bg-white/80 backdrop-blur-sm rounded-2xl p-2 border border-purple-200/50 shadow-xl">
+      {/* Compact Navigation Tabs */}
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="flex items-center justify-center mb-4">
+          <div className="flex items-center space-x-1 bg-white/80 backdrop-blur-sm rounded-xl p-1 border border-blue-200/50 shadow-lg">
             {[
               { id: 'overview', label: 'Overview', icon: ChartBarIcon },
-              { id: 'stories', label: 'Story Analysis', icon: BookOpenIcon },
+              { id: 'stories', label: 'Stories', icon: BookOpenIcon },
               { id: 'parameters', label: 'Parameters', icon: AdjustmentsHorizontalIcon },
-              { id: 'insights', label: 'AI Insights', icon: BulbIcon },
-              { id: 'comparison', label: 'Comparison', icon: ArrowsUpDownIcon }
+              { id: 'insights', label: 'Insights', icon: BulbIcon },
+              { id: 'comparison', label: 'Compare', icon: ArrowsUpDownIcon }
             ].map((tab) => {
               const Icon = tab.icon;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveView(tab.id)}
-                  className={`flex items-center space-x-2 px-4 py-3 rounded-xl font-bold transition-all duration-300 transform hover:scale-105 ${
+                  className={`flex items-center space-x-1.5 px-3 py-2 rounded-lg font-medium transition-all duration-200 text-sm ${
                     activeView === tab.id
-                      ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg'
-                      : 'text-purple-700 hover:bg-white/80 hover:shadow-md'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white shadow-md'
+                      : 'text-gray-700 hover:bg-white/80 hover:shadow-sm'
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="hidden md:inline">{tab.label}</span>
+                  <Icon className="w-4 h-4" />
+                  <span className="hidden sm:inline">{tab.label}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Content Views */}
-        <div className="space-y-8">
+        {/* Compact Content Views */}
+        <div className="space-y-4">
           {activeView === 'overview' && (
             <>
               <ParameterOptimizationChart />
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                 <ThematicAnalysisRadar />
                 <EngagementPredictionChart />
               </div>
@@ -695,18 +695,18 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
           )}
 
           {activeView === 'stories' && (
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {analysisData.stories.map((story) => (
                 <div 
                   key={story.id}
-                  className="bg-white/90 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-6 hover:shadow-2xl transition-all duration-300"
+                  className="bg-white/90 backdrop-blur-sm rounded-xl border border-blue-200/50 shadow-lg p-4 hover:shadow-xl transition-all duration-200"
                 >
-                  <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-start justify-between mb-3">
                     <div>
-                      <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                      <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                         {story.title}
                       </h3>
-                      <p className="text-purple-600 font-medium">{story.subtitle}</p>
+                      <p className="text-blue-600 font-medium text-sm">{story.subtitle}</p>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-black" style={{ color: getQualityColor(story.metrics.overall_quality) }}>
