@@ -56,6 +56,10 @@ const ParameterTesting = ({ onNavigate }) => {
   const [responseMetrics, setResponseMetrics] = useState(null);
   const [lastExperiment, setLastExperiment] = useState(null);
 
+  // Ref for scrolling to results
+  const resultsRef = React.useRef(null);
+  const topRef = React.useRef(null);
+
   const parameterPresets = [
     {
       id: 'creative',
@@ -237,7 +241,18 @@ const ParameterTesting = ({ onNavigate }) => {
       };
       
       setResponseMetrics(mockMetrics);
-      success('Response generated successfully! (Mock data)');
+      success('Response generated successfully! Scrolling to results... 📊');
+      
+      // Scroll to results section after a short delay
+      setTimeout(() => {
+        if (resultsRef.current) {
+          resultsRef.current.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'start',
+            inline: 'nearest'
+          });
+        }
+      }, 500); // Small delay to ensure content is rendered
       
     } catch (err) {
       showError('Failed to generate response');
@@ -339,7 +354,7 @@ const ParameterTesting = ({ onNavigate }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div ref={topRef} className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white">
         <div className="px-6 py-8">
@@ -496,7 +511,7 @@ const ParameterTesting = ({ onNavigate }) => {
 
       {/* Row 5: Comprehensive Response Analysis */}
       {generatedResponse && (
-        <div className="space-y-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-2xl border border-purple-200/50 shadow-xl p-6">
+        <div ref={resultsRef} className="space-y-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-2xl border border-purple-200/50 shadow-xl p-6 animate-pulse">
           {/* Header */}
           <div className="flex items-start justify-between mb-6">
             <div>
@@ -711,7 +726,22 @@ const ParameterTesting = ({ onNavigate }) => {
                   <DocumentTextIcon className="w-5 h-5" />
                   <span>Save Experiment</span>
                 </button>
-                <button className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 font-bold shadow-md hover:shadow-lg transform hover:scale-105">
+                <button 
+                  onClick={() => {
+                    // Scroll to top first
+                    if (topRef.current) {
+                      topRef.current.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'start' 
+                      });
+                    }
+                    // Then trigger new generation after a short delay
+                    setTimeout(() => {
+                      generateResponse();
+                    }, 800);
+                  }}
+                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 font-bold shadow-md hover:shadow-lg transform hover:scale-105"
+                >
                   <ArrowPathIcon className="w-5 h-5" />
                   <span>Generate Another</span>
                 </button>
