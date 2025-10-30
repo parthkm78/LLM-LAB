@@ -76,8 +76,14 @@ cp .env.example .env
 5. **Database Setup**
 ```bash
 cd ../backend
+# Option 1: Run individual migrations (recommended)
+npm run db:migrate:001  # Core schema
+npm run db:migrate:002  # Authentication & users
+npm run db:migrate:003  # Advanced features
+npm run db:migrate:004  # Production optimizations
+
+# Option 2: Run all migrations at once
 npm run db:setup
-npm run db:migrate
 npm run db:seed
 ```
 
@@ -99,21 +105,26 @@ npm start
 
 ## 📚 Documentation
 
+### **Quick Start Guides**
+- [Installation Guide](./docs/INSTALLATION.md) - Complete setup instructions
+- [Deployment Guide](./docs/DEPLOYMENT.md) - Production deployment options
+- [Contributing Guidelines](./docs/CONTRIBUTING.md) - Development workflow
+- [Troubleshooting Guide](./docs/TROUBLESHOOTING.md) - Common issues and solutions
+
 ### **Technical Documentation**
-- [System Architecture](./docs/Architecture/SYSTEM_ARCHITECTURE_DOCUMENT.md)
-- [Backend API Specification](./docs/backend-apis%20document/BACKEND_API_SPECIFICATION.md)
-- [Features Documentation](./docs/Features/LLM_LAB_FEATURES_DOCUMENTATION.md)
+- [System Architecture](./docs/Architecture/SYSTEM_ARCHITECTURE_DOCUMENT.md) - System design overview
+- [Backend API Specification](./docs/backend-apis%20document/BACKEND_API_SPECIFICATION.md) - Complete API documentation
+- [Features Documentation](./LLM_LAB_FEATURES_DOCUMENTATION.md) - Comprehensive feature listing
+- [Security Documentation](./docs/SECURITY.md) - Security best practices and compliance
 
 ### **Component Specifications**
 - [Quality Metrics System](./docs/Techncial%20document/Quality%20Metrix/QUALITY_METRICS_TECHNICAL_SPECIFICATION.md)
 - [Parameter Testing Lab](./docs/Techncial%20document/Perameter%20TestingLab/PARAMETER_TESTING_TECHNICAL_SPECIFICATION.md)
 - [Batch Experiment Analysis](./docs/Techncial%20document/Batch%20Experiment/BATCH_EXPERIMENT_ANALYSIS.md)
 
-### **Development Documentation**
-- [Installation Guide](./docs/INSTALLATION.md)
-- [Deployment Guide](./docs/DEPLOYMENT.md)
-- [Contributing Guidelines](./docs/CONTRIBUTING.md)
-- [API Documentation](./docs/API.md)
+### **Database & Migration**
+- [Database Migration Guide](./docs/migration_script/README.md) - Complete migration instructions
+- [Schema Documentation](./docs/migration_script/) - Database structure and setup
 
 ## 🛠️ Development
 
