@@ -226,6 +226,29 @@ const BatchExperiments = () => {
     });
     
     setIsCreatingBatch(false);
+    
+    // Scroll to batch jobs section after creation
+    setTimeout(() => {
+      const batchJobsSection = document.getElementById('batch-jobs-section');
+      if (batchJobsSection) {
+        batchJobsSection.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'start'
+        });
+        
+        // Add a brief visual highlight to the section
+        batchJobsSection.style.transition = 'all 0.3s ease';
+        batchJobsSection.style.backgroundColor = 'rgba(59, 130, 246, 0.1)';
+        batchJobsSection.style.borderRadius = '12px';
+        batchJobsSection.style.padding = '8px';
+        
+        // Remove highlight after 2 seconds
+        setTimeout(() => {
+          batchJobsSection.style.backgroundColor = '';
+          batchJobsSection.style.padding = '';
+        }, 2000);
+      }
+    }, 100); // Small delay to ensure the new batch is rendered
   };
 
   const startBatch = (id) => {
@@ -1297,7 +1320,7 @@ Write a creative story about a time traveler who discovers that changing the pas
         </div>
 
         {/* Jobs List with Pagination */}
-        <div className="space-y-6">
+        <div id="batch-jobs-section" className="space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Batch Jobs</h2>
             <div className="flex items-center space-x-4">
