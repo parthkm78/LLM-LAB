@@ -1,8 +1,9 @@
 import axios from 'axios';
 
 // Create axios instance with base configuration
+// NOTE: API calls have been disabled - using mock data instead
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  baseURL: process.env.REACT_APP_API_URL || '/api', // Removed localhost:5000 to prevent proxy errors
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
