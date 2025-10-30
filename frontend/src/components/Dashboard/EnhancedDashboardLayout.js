@@ -15,8 +15,6 @@ import DashboardSettings from './pages/DashboardSettings';
 import SingleExperimentResults from './pages/SingleExperimentResults';
 import BatchResultsAnalysis from './pages/BatchResultsAnalysis';
 import ExperimentHistory from './pages/ExperimentHistory';
-import CreativeWritingBatchView from './pages/CreativeWritingBatchView';
-import AdvancedCreativeAnalysis from './pages/AdvancedCreativeAnalysis';
 
 const EnhancedDashboardLayout = () => {
   const [activeSection, setActiveSection] = useState('overview');
@@ -27,33 +25,29 @@ const EnhancedDashboardLayout = () => {
     switch (activeSection) {
       case 'overview':
       case 'recent':
-        return <DashboardOverview section={activeSection} onNavigate={setActiveSection} />;
+        return <DashboardOverview section={activeSection} />;
       case 'parameters':
-        return <ParameterTesting onNavigate={setActiveSection} />;
+        return <ParameterTesting />;
       case 'quality':
-        return <QualityMetrics onNavigate={setActiveSection} />;
+        return <QualityMetrics />;
       case 'comparison':
-        return <ResponseComparison onNavigate={setActiveSection} />;
+        return <ResponseComparison />;
       case 'batch':
-        return <BatchExperiments onNavigate={setActiveSection} />;
+        return <BatchExperiments />;
       case 'analytics':
-        return <AdvancedAnalytics onNavigate={setActiveSection} />;
+        return <AdvancedAnalytics />;
       case 'datasets':
-        return <DatasetManager onNavigate={setActiveSection} />;
+        return <DatasetManager />;
       case 'models':
-        return <ModelManagement onNavigate={setActiveSection} />;
+        return <ModelManagement />;
       case 'settings':
-        return <DashboardSettings onNavigate={setActiveSection} />;
+        return <DashboardSettings />;
       case 'single-results':
-        return <SingleExperimentResults onNavigate={setActiveSection} />;
+        return <SingleExperimentResults />;
       case 'batch-results':
-        return <BatchResultsAnalysis onNavigate={setActiveSection} />;
+        return <BatchResultsAnalysis />;
       case 'history':
-        return <ExperimentHistory onNavigate={setActiveSection} />;
-      case 'creative-writing-batch':
-        return <CreativeWritingBatchView onBack={() => setActiveSection('quality')} onNavigate={setActiveSection} />;
-      case 'advanced-creative-analysis':
-        return <AdvancedCreativeAnalysis onBack={() => setActiveSection('quality')} onNavigate={setActiveSection} />;
+        return <ExperimentHistory />;
       default:
         return (
           <div className="flex items-center justify-center h-full">
@@ -84,9 +78,7 @@ const EnhancedDashboardLayout = () => {
       settings: 'Settings',
       'single-results': 'Experiment Results',
       'batch-results': 'Batch Analysis',
-      'history': 'Experiment History',
-      'creative-writing-batch': 'Creative Writing Analysis',
-      'advanced-creative-analysis': 'Advanced Creative Analysis'
+      'history': 'Experiment History'
     };
     return titles[activeSection] || 'Dashboard';
   };

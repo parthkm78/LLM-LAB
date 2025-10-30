@@ -14,9 +14,7 @@ import {
   ChartPieIcon,
   CubeTransparentIcon,
   PresentationChartLineIcon,
-  TableCellsIcon,
-  BookOpenIcon,
-  StarIcon
+  TableCellsIcon
 } from '@heroicons/react/24/outline';
 import { 
   LineChart, 
@@ -45,7 +43,7 @@ import {
 } from 'recharts';
 import { designTokens, getQualityColor, getQualityColorWithOpacity } from '../../../styles/designTokens';
 
-const QualityMetrics = ({ onNavigate }) => {
+const QualityMetrics = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState('7d');
   const [selectedMetric, setSelectedMetric] = useState('overall_quality');
   const [activeTab, setActiveTab] = useState('metrics'); // 'metrics' or 'advanced'
@@ -638,64 +636,6 @@ const QualityMetrics = ({ onNavigate }) => {
                 <ChartPieIcon className="w-4 h-4" />
                 <span>View Charts</span>
               </button>
-            </div>
-          </div>
-
-          {/* Featured Batch Analysis */}
-          <div className="mb-6 bg-gradient-to-br from-purple-500/10 to-pink-500/10 backdrop-blur-sm rounded-2xl border border-purple-200/50 shadow-xl p-6">
-            <div className="flex items-start justify-between">
-              <div className="flex items-start space-x-4">
-                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg">
-                  <SparklesIcon className="w-6 h-6 text-white" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mb-2">
-                    🎨 Creative Writing Analysis - Batch Results
-                  </h3>
-                  <p className="text-purple-700 mb-3 font-medium">
-                    Explore detailed analysis of our Creative Writing experiment with 8 AI-generated stories. 
-                    See how different parameters affect creativity, coherence, and emotional depth.
-                  </p>
-                  <div className="flex items-center space-x-6 text-sm text-purple-600 mb-4">
-                    <span className="flex items-center space-x-1">
-                      <DocumentTextIcon className="w-4 h-4" />
-                      <span className="font-bold">8 Stories Generated</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <StarIcon className="w-4 h-4" />
-                      <span className="font-bold">94.2% Best Quality</span>
-                    </span>
-                    <span className="flex items-center space-x-1">
-                      <SparklesIcon className="w-4 h-4" />
-                      <span className="font-bold">96% Max Creativity</span>
-                    </span>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    <span className="px-3 py-1 bg-purple-100 text-purple-700 rounded-lg text-xs font-medium">
-                      AI Consciousness
-                    </span>
-                    <span className="px-3 py-1 bg-pink-100 text-pink-700 rounded-lg text-xs font-medium">
-                      Emotional Discovery
-                    </span>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-lg text-xs font-medium">
-                      Creative Fiction
-                    </span>
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col items-end space-y-3">
-                <button 
-                  onClick={() => onNavigate && onNavigate('advanced-creative-analysis')} 
-                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-xl hover:from-purple-600 hover:to-pink-600 transition-all duration-300 font-bold shadow-lg hover:shadow-xl transform hover:scale-105"
-                >
-                  <BookOpenIcon className="w-5 h-5" />
-                  <span>Explore Advanced Analysis</span>
-                </button>
-                <button className="flex items-center space-x-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-purple-200 text-purple-700 rounded-lg hover:bg-purple-50 transition-all duration-300 text-sm font-medium">
-                  <ArrowDownTrayIcon className="w-4 h-4" />
-                  <span>Download Report</span>
-                </button>
-              </div>
             </div>
           </div>
 

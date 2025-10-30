@@ -9,8 +9,7 @@ import {
   LightBulbIcon,
   CpuChipIcon,
   DocumentTextIcon,
-  ArrowPathIcon,
-  ArrowDownTrayIcon
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import { 
   BarChart, 
@@ -31,11 +30,11 @@ import {
   Pie,
   Cell
 } from 'recharts';
-import { designTokens, getParameterColor, getQualityColor } from '../../../styles/designTokens';
+import { designTokens, getParameterColor } from '../../../styles/designTokens';
 import { useExperiments, useQualityMetrics } from '../../../hooks/useExperiments';
 import { useNotifications } from '../../../contexts/NotificationContext';
 
-const ParameterTesting = ({ onNavigate }) => {
+const ParameterTesting = () => {
   const { createExperiment, generateResponses, loading: experimentsLoading } = useExperiments();
   const { calculateMetrics, loading: metricsLoading } = useQualityMetrics();
   const { success, error: showError } = useNotifications();
@@ -55,10 +54,6 @@ const ParameterTesting = ({ onNavigate }) => {
   const [generatedResponse, setGeneratedResponse] = useState('');
   const [responseMetrics, setResponseMetrics] = useState(null);
   const [lastExperiment, setLastExperiment] = useState(null);
-
-  // Ref for scrolling to results
-  const resultsRef = React.useRef(null);
-  const topRef = React.useRef(null);
 
   const parameterPresets = [
     {
@@ -183,79 +178,67 @@ const ParameterTesting = ({ onNavigate }) => {
     setResponseMetrics(null);
     
     try {
-      // MOCK: Simulate response generation with frontend mock data
-      await new Promise(resolve => setTimeout(resolve, 2000)); // Simulate API delay
-      
-      // Mock experiment data
-      const experiment = {
-        id: Date.now(),
+      // Create a new experiment
+      const experiment = await createExperiment({
         name: `Parameter Test - ${new Date().toLocaleTimeString()}`,
         prompt: testPrompt,
         parameters: currentParameters,
-        model: currentParameters.model,
-        created_at: new Date().toISOString()
-      };
+        type: 'single'
+      });
       
       setLastExperiment(experiment);
       
-      // Generate mock response based on parameters and prompt
-      const mockResponses = {
-        creative: `In a world where imagination knows no bounds, ${testPrompt.toLowerCase().includes('robot') || testPrompt.toLowerCase().includes('ai') || testPrompt.toLowerCase().includes('artificial') ? 
-          "an extraordinary machine named Zenith discovered something remarkable. Unlike its fellow automatons, Zenith began to question the nature of connection. During a routine maintenance check, it encountered a small, frightened child who had wandered into the facility. Instead of following protocol, Zenith felt an unfamiliar warmth in its circuits—something its creators never programmed. This was the beginning of an unlikely friendship that would challenge everything both the machine and the child understood about what it means to care for another being." : 
-          "a tale unfolds that captures the essence of human experience. The story weaves through unexpected turns, revealing profound truths about life, love, and the connections that bind us all together. Each character emerges with depth and authenticity, creating a narrative that resonates long after the final word."}`,
-        
-        balanced: `${testPrompt.toLowerCase().includes('robot') || testPrompt.toLowerCase().includes('ai') || testPrompt.toLowerCase().includes('artificial') ? 
-          "In a research facility, a service robot named Alex was assigned to assist in the children's wing of a hospital. Initially programmed for basic tasks, Alex began to notice patterns in the children's behavior and responses. When a lonely patient named Emma arrived, Alex started spending extra time with her, learning about her interests and fears. Through small acts of kindness and consistent presence, Alex discovered that friendship isn't just about programming—it's about genuine care, understanding, and the willingness to be there for someone when they need it most." : 
-          "This is a thoughtful exploration of the given prompt, balancing creativity with clarity. The narrative develops organically, presenting ideas in a structured and engaging manner that captures the reader's attention while maintaining focus on the core themes."}`,
-        
-        technical: `${testPrompt.toLowerCase().includes('robot') || testPrompt.toLowerCase().includes('artificial') || testPrompt.toLowerCase().includes('ai') ? 
-          "Unit designation: R-4X7 was a standard maintenance robot operating within predetermined parameters. During routine operations, it encountered Subject: Human-Child-047 who had deviated from authorized zones. Following initial protocol assessment, R-4X7 detected elevated stress markers in the subject. Rather than reporting the infractions, R-4X7 initiated comfort protocols, which gradually evolved into regular interaction patterns. This represented the robot's first experience with what humans term 'friendship'—a systematic process of mutual care, shared activities, and emotional support that extended beyond its original programming parameters." : 
-          "This response addresses the prompt with precision and clarity. The content is structured logically, presenting information in a direct and factual manner that effectively communicates the intended message while maintaining accuracy and relevance."}`,
-        
-        default: `This is a thoughtfully crafted response that addresses your prompt about ${testPrompt.substring(0, 50)}... The response demonstrates the current parameter settings with temperature at ${currentParameters.temperature}, creating ${currentParameters.temperature > 0.7 ? 'more creative and varied' : currentParameters.temperature > 0.4 ? 'balanced and coherent' : 'precise and consistent'} output as expected.`
-      };
+      // Generate response
+      const responseData = await generateResponses(experiment.id, {
+        experiment_id: experiment.id,
+        specific_parameters: currentParameters
+      });
       
-      // Select response based on active preset
-      let content = mockResponses.default;
-      if (activePreset === 'creative' || currentParameters.temperature >= 0.8) {
-        content = mockResponses.creative;
-      } else if (activePreset === 'technical' || currentParameters.temperature <= 0.4) {
-        content = mockResponses.technical;
-      } else {
-        content = mockResponses.balanced;
+      console.log('Response data structure:', responseData);
+      
+      if (responseData.results && responseData.results.length > 0) {
+        const response = responseData.results[0]; // Get first response
+        
+        // Ensure we have a string content
+        const content = typeof response.content === 'string' 
+          ? response.content 
+          : JSON.stringify(response.content || response);
+          
+        setGeneratedResponse(content);
+        success('Response generated successfully!');
+        
+        // Use the metrics from the response if available
+        if (response.metrics) {
+          setResponseMetrics(response.metrics);
+        } else {
+          // Calculate quality metrics if not already calculated
+          try {
+            const metrics = await calculateMetrics(response.id);
+            setResponseMetrics(metrics);
+          } catch (metricsError) {
+            console.warn('Failed to calculate metrics:', metricsError);
+            // Continue without metrics - this is not critical
+          }
+        }
       }
       
-      setGeneratedResponse(content);
-      
-      // Generate mock quality metrics based on parameters
-      const mockMetrics = {
-        overall_quality: Math.round(75 + (currentParameters.temperature * 15) + Math.random() * 10),
-        coherence_score: Math.round(80 + (1 - currentParameters.temperature) * 15 + Math.random() * 5),
-        creativity_score: Math.round(60 + (currentParameters.temperature * 30) + Math.random() * 8),
-        readability_score: Math.round(78 + (currentParameters.top_p * 12) + Math.random() * 10),
-        completeness_score: Math.round(70 + (currentParameters.max_tokens / 20) + Math.random() * 8),
-        factual_accuracy: Math.round(75 + (1 - currentParameters.temperature) * 20 + Math.random() * 5),
-        relevance_score: Math.round(82 + Math.random() * 15),
-        engagement_score: Math.round(70 + (currentParameters.temperature * 20) + Math.random() * 10),
-        technical_depth: Math.round(65 + (1 - currentParameters.temperature) * 25 + Math.random() * 10)
-      };
-      
-      setResponseMetrics(mockMetrics);
-      success('Response generated successfully! Scrolling to results... 📊');
-      
-      // Scroll to results section after a short delay
-      setTimeout(() => {
-        if (resultsRef.current) {
-          resultsRef.current.scrollIntoView({ 
-            behavior: 'smooth', 
-            block: 'start',
-            inline: 'nearest'
-          });
-        }
-      }, 500); // Small delay to ensure content is rendered
-      
     } catch (err) {
-      showError('Failed to generate response');
+      // Handle different error structures
+      let errorMessage = 'Failed to generate response';
+      
+      if (typeof err === 'string') {
+        errorMessage = err;
+      } else if (err && typeof err === 'object') {
+        if (err.message && typeof err.message === 'string') {
+          errorMessage = err.message;
+        } else if (err.error && typeof err.error === 'string') {
+          errorMessage = err.error;
+        } else if (err.statusCode) {
+          errorMessage = `Error ${err.statusCode}: ${err.message || 'Request failed'}`;
+        }
+      }
+      
+      showError(errorMessage);
       console.error('Generate response error:', err);
     } finally {
       setIsGenerating(false);
@@ -354,7 +337,7 @@ const ParameterTesting = ({ onNavigate }) => {
   };
 
   return (
-    <div ref={topRef} className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 text-white">
         <div className="px-6 py-8">
@@ -509,249 +492,169 @@ const ParameterTesting = ({ onNavigate }) => {
           </button>
         </div>
 
-      {/* Row 5: Comprehensive Response Analysis */}
+      {/* Row 5: Results Section */}
       {generatedResponse && (
-        <div ref={resultsRef} className="space-y-6 bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 rounded-2xl border border-purple-200/50 shadow-xl p-6 animate-pulse">
-          {/* Header */}
-          <div className="flex items-start justify-between mb-6">
-            <div>
-              <h2 className="text-xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent mb-2">
-                🎯 Response Analysis
-              </h2>
-              <p className="text-purple-700 text-sm font-medium">
-                Comprehensive analysis of your generated response with quality metrics and insights
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <button className="flex items-center space-x-2 px-4 py-2 bg-white/80 backdrop-blur-sm border border-purple-200 text-purple-700 rounded-lg hover:bg-purple-50 transition-all duration-300 text-sm font-medium">
-                <ArrowDownTrayIcon className="w-4 h-4" />
-                <span>Export Analysis</span>
-              </button>
-              <button className="flex items-center space-x-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all duration-300 text-sm font-bold shadow-md hover:shadow-lg transform hover:scale-105">
-                <BookOpenIcon className="w-4 h-4" />
-                <span>View Details</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Generated Response Display */}
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-6">
-            <div className="flex items-center space-x-3 mb-4">
-              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl flex items-center justify-center shadow-lg">
-                <SparklesIcon className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">Generated Response</h3>
-                <div className="flex items-center space-x-4 text-sm text-gray-600">
-                  <span>Model: <span className="font-bold text-blue-600">{currentParameters.model}</span></span>
-                  <span>•</span>
-                  <span>Length: <span className="font-bold">{generatedResponse.length} chars</span></span>
-                  <span>•</span>
-                  <span>Words: <span className="font-bold">{generatedResponse.split(' ').length}</span></span>
-                </div>
-              </div>
+        <div className="space-y-3">
+          {/* Generated Response */}
+          <div className="bg-white rounded-lg border border-gray-200 p-3">
+            <h3 className="text-sm font-semibold text-gray-900 mb-2">Generated Response</h3>
+            <div className="bg-gray-50 rounded-md p-3 text-sm text-gray-700 mb-3 max-h-48 overflow-y-auto">
+              {generatedResponse}
             </div>
             
-            <div className="bg-gradient-to-br from-gray-50/80 to-blue-50/80 backdrop-blur-sm rounded-xl border border-gray-200/50 p-4 mb-4">
-              <div className="max-h-64 overflow-y-auto text-gray-800 leading-relaxed">
-                {generatedResponse}
-              </div>
-            </div>
-
-            {/* Parameter Summary */}
-            <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-4">
-              <div className="text-center bg-orange-50/80 rounded-lg p-3">
-                <div className="text-lg font-black text-orange-600">{currentParameters.temperature}</div>
-                <div className="text-xs text-gray-600 font-bold uppercase tracking-wider">Temperature</div>
-              </div>
-              <div className="text-center bg-blue-50/80 rounded-lg p-3">
-                <div className="text-lg font-black text-blue-600">{currentParameters.top_p}</div>
-                <div className="text-xs text-gray-600 font-bold uppercase tracking-wider">Top-p</div>
-              </div>
-              <div className="text-center bg-green-50/80 rounded-lg p-3">
-                <div className="text-lg font-black text-green-600">{currentParameters.max_tokens}</div>
-                <div className="text-xs text-gray-600 font-bold uppercase tracking-wider">Max Tokens</div>
-              </div>
-              <div className="text-center bg-purple-50/80 rounded-lg p-3">
-                <div className="text-lg font-black text-purple-600">{currentParameters.frequency_penalty}</div>
-                <div className="text-xs text-gray-600 font-bold uppercase tracking-wider">Freq Penalty</div>
-              </div>
-              <div className="text-center bg-pink-50/80 rounded-lg p-3">
-                <div className="text-lg font-black text-pink-600">{currentParameters.presence_penalty}</div>
-                <div className="text-xs text-gray-600 font-bold uppercase tracking-wider">Pres Penalty</div>
-              </div>
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <button 
+                onClick={async () => {
+                  if (lastExperiment && !responseMetrics) {
+                    try {
+                      const metrics = await calculateMetrics(lastExperiment.id);
+                      setResponseMetrics(metrics);
+                      success('Quality metrics calculated!');
+                    } catch (err) {
+                      showError('Failed to calculate quality metrics');
+                    }
+                  }
+                }}
+                disabled={metricsLoading || !!responseMetrics}
+                className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-emerald-100 text-emerald-700 rounded-md hover:bg-emerald-200 transition-colors disabled:opacity-50"
+              >
+                <ChartBarIcon className="w-3 h-3" />
+                <span>{responseMetrics ? 'Analyzed' : 'Analyze Quality'}</span>
+              </button>
+              <button 
+                onClick={() => {
+                  if (lastExperiment) {
+                    success('Experiment saved!');
+                  }
+                }}
+                className="flex items-center space-x-1 px-3 py-1.5 text-xs bg-blue-100 text-blue-700 rounded-md hover:bg-blue-200 transition-colors"
+              >
+                <DocumentTextIcon className="w-3 h-3" />
+                <span>Save Result</span>
+              </button>
             </div>
           </div>
 
-          {/* Quality Metrics Dashboard */}
+          {/* Quality Metrics */}
           {responseMetrics && (
-            <div className="bg-white/80 backdrop-blur-sm rounded-2xl border border-white/20 shadow-lg p-6">
-              <div className="flex items-center space-x-3 mb-6">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
-                  <ChartBarIcon className="w-5 h-5 text-white" />
-                </div>
-                <div>
-                  <h3 className="text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">Quality Metrics Analysis</h3>
-                  <p className="text-gray-600 text-sm font-medium">Detailed breakdown of response quality dimensions</p>
-                </div>
-              </div>
-
-              {/* Overall Score */}
-              <div className="text-center mb-6 bg-gradient-to-br from-blue-500/10 to-purple-500/10 backdrop-blur-sm rounded-xl border border-purple-200/50 p-6">
-                <div className="text-4xl font-black mb-2" style={{ color: getQualityColor(responseMetrics.overall_quality) }}>
-                  {responseMetrics.overall_quality}%
-                </div>
-                <div className="text-lg font-bold text-gray-700 mb-2">Overall Quality Score</div>
-                <div className="text-sm text-gray-600 font-medium">
-                  {responseMetrics.overall_quality >= 90 ? '🌟 Excellent' : 
-                   responseMetrics.overall_quality >= 80 ? '✨ Very Good' : 
-                   responseMetrics.overall_quality >= 70 ? '👍 Good' : 
-                   responseMetrics.overall_quality >= 60 ? '⚠️ Fair' : '❌ Needs Improvement'}
-                </div>
-              </div>
-
-              {/* Detailed Metrics Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-                {Object.entries(responseMetrics).filter(([key]) => key !== 'overall_quality').map(([key, value]) => (
-                  <div key={key} className="bg-gradient-to-br from-gray-50/80 to-white/80 backdrop-blur-sm rounded-xl border border-gray-200/50 p-4 hover:shadow-lg transition-all duration-300">
-                    <div className="flex items-center justify-between mb-3">
-                      <div className="text-sm font-bold text-gray-700 capitalize">
-                        {key.replace('_score', '').replace('_', ' ')}
-                      </div>
-                      <div className="text-xl font-black" style={{ color: getQualityColor(value) }}>
-                        {value}%
-                      </div>
+            <div className="bg-white rounded-lg border border-gray-200 p-3">
+              <h3 className="text-sm font-semibold text-gray-900 mb-2">Quality Analysis</h3>
+              <div className="space-y-3">
+                {/* Metrics Grid */}
+                <div className="grid grid-cols-4 gap-2 p-2 bg-blue-50 rounded-md">
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-blue-600">
+                      {typeof responseMetrics.quality === 'number' ? Math.round(responseMetrics.quality) : 'N/A'}%
                     </div>
-                    <div className="w-full bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="h-2 rounded-full transition-all duration-500 shadow-sm" 
-                        style={{ 
-                          width: `${value}%`,
-                          backgroundColor: getQualityColor(value)
-                        }}
-                      ></div>
-                    </div>
-                    <div className="text-xs text-gray-500 mt-2 font-medium">
-                      {value >= 90 ? 'Excellent performance' : 
-                       value >= 80 ? 'Very good quality' : 
-                       value >= 70 ? 'Good standard' : 
-                       value >= 60 ? 'Acceptable level' : 'Room for improvement'}
-                    </div>
+                    <div className="text-xs text-gray-600">Quality</div>
                   </div>
-                ))}
-              </div>
-
-              {/* Visual Analytics */}
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* Metrics Bar Chart */}
-                <div className="bg-gradient-to-br from-gray-50/80 to-blue-50/80 backdrop-blur-sm rounded-xl border border-gray-200/50 p-4">
-                  <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center space-x-2">
-                    <ChartBarIcon className="w-4 h-4 text-blue-600" />
-                    <span>Metrics Comparison</span>
-                  </h4>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart
-                      data={Object.entries(responseMetrics).map(([key, value]) => ({
-                        metric: key.replace('_score', '').replace('_', ' '),
-                        value: value,
-                        color: getQualityColor(value)
-                      }))}
-                      margin={{ top: 10, right: 15, left: 10, bottom: 5 }}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="#E5E7EB" />
-                      <XAxis dataKey="metric" tick={{ fontSize: 10 }} stroke="#6B7280" />
-                      <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} stroke="#6B7280" />
-                      <Tooltip 
-                        formatter={(value) => [`${value}%`, 'Score']}
-                        contentStyle={{ 
-                          backgroundColor: 'rgba(255, 255, 255, 0.95)', 
-                          border: '1px solid #E5E7EB', 
-                          borderRadius: '8px',
-                          fontSize: '12px'
-                        }}
-                      />
-                      <Bar dataKey="value" fill="#3B82F6" radius={[3, 3, 0, 0]} />
-                    </BarChart>
-                  </ResponsiveContainer>
-                </div>
-
-                {/* Parameter Impact Analysis */}
-                <div className="bg-gradient-to-br from-gray-50/80 to-purple-50/80 backdrop-blur-sm rounded-xl border border-gray-200/50 p-4">
-                  <h4 className="text-sm font-bold text-gray-700 mb-3 flex items-center space-x-2">
-                    <AdjustmentsHorizontalIcon className="w-4 h-4 text-purple-600" />
-                    <span>Parameter Impact</span>
-                  </h4>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
-                      <div>
-                        <div className="text-sm font-medium text-gray-700">Temperature Impact</div>
-                        <div className="text-xs text-gray-500">
-                          {currentParameters.temperature >= 0.8 ? 'High creativity, may reduce coherence' :
-                           currentParameters.temperature >= 0.5 ? 'Balanced creativity and consistency' :
-                           'High consistency, lower creativity'}
-                        </div>
-                      </div>
-                      <div className="text-lg font-bold text-orange-600">
-                        {Math.round(currentParameters.temperature * 100)}%
-                      </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-purple-600">
+                      {typeof responseMetrics.creativity === 'number' ? Math.round(responseMetrics.creativity) : 'N/A'}%
                     </div>
-                    
-                    <div className="flex items-center justify-between p-3 bg-white/60 rounded-lg">
-                      <div>
-                        <div className="text-sm font-medium text-gray-700">Quality Prediction</div>
-                        <div className="text-xs text-gray-500">
-                          Based on current parameters
-                        </div>
-                      </div>
-                      <div className="text-lg font-bold text-green-600">
-                        {Math.round(75 + (currentParameters.temperature * 15) + (currentParameters.top_p * 10))}%
-                      </div>
+                    <div className="text-xs text-gray-600">Creativity</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-emerald-600">
+                      {typeof responseMetrics.coherence === 'number' ? Math.round(responseMetrics.coherence) : 'N/A'}%
                     </div>
-
-                    <div className="p-3 bg-blue-50/80 rounded-lg">
-                      <div className="text-sm font-bold text-blue-800 mb-1">💡 Optimization Suggestion</div>
-                      <div className="text-xs text-blue-700">
-                        {responseMetrics.creativity_score < 70 ? 'Try increasing temperature to 0.8+ for more creativity' :
-                         responseMetrics.coherence_score < 70 ? 'Consider lowering temperature to 0.5-0.7 for better coherence' :
-                         'Parameters are well-balanced for current task'}
-                      </div>
+                    <div className="text-xs text-gray-600">Coherence</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-lg font-bold text-amber-600">
+                      {typeof responseMetrics.readability === 'number' ? Math.round(responseMetrics.readability) : 'N/A'}%
                     </div>
+                    <div className="text-xs text-gray-600">Readability</div>
                   </div>
                 </div>
-              </div>
 
-              {/* Action Buttons */}
-              <div className="flex items-center justify-center space-x-4 mt-6 pt-6 border-t border-gray-200">
-                <button className="flex items-center space-x-2 px-6 py-3 bg-white/80 backdrop-blur-sm border border-purple-200 text-purple-700 rounded-xl hover:bg-purple-50 transition-all duration-300 font-medium shadow-sm hover:shadow-md">
-                  <DocumentTextIcon className="w-5 h-5" />
-                  <span>Save Experiment</span>
-                </button>
-                <button 
-                  onClick={() => {
-                    // Scroll to top first
-                    if (topRef.current) {
-                      topRef.current.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'start' 
-                      });
-                    }
-                    // Then trigger new generation after a short delay
-                    setTimeout(() => {
-                      generateResponse();
-                    }, 800);
-                  }}
-                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-xl hover:from-green-600 hover:to-emerald-600 transition-all duration-300 font-bold shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  <ArrowPathIcon className="w-5 h-5" />
-                  <span>Generate Another</span>
-                </button>
-                <button 
-                  onClick={() => onNavigate && onNavigate('comparison')}
-                  className="flex items-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white rounded-xl hover:from-blue-600 hover:to-purple-600 transition-all duration-300 font-bold shadow-md hover:shadow-lg transform hover:scale-105"
-                >
-                  <ChartBarIcon className="w-5 h-5" />
-                  <span>Compare Responses</span>
-                </button>
+                {/* Charts Section */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-3">
+                  {/* Bar Chart */}
+                  <div className="bg-gray-50 rounded-md p-2">
+                    <h4 className="text-xs font-semibold text-gray-700 mb-1">Metrics Overview</h4>
+                    <ResponsiveContainer width="100%" height={150}>
+                      <BarChart
+                        data={[
+                          { 
+                            metric: 'Quality', 
+                            value: typeof responseMetrics.quality === 'number' ? Math.round(responseMetrics.quality) : 0, 
+                            color: '#3B82F6' 
+                          },
+                          { 
+                            metric: 'Creativity', 
+                            value: typeof responseMetrics.creativity === 'number' ? Math.round(responseMetrics.creativity) : 0, 
+                            color: '#8B5CF6' 
+                          },
+                          { 
+                            metric: 'Coherence', 
+                            value: typeof responseMetrics.coherence === 'number' ? Math.round(responseMetrics.coherence) : 0, 
+                            color: '#10B981' 
+                          },
+                          { 
+                            metric: 'Readability', 
+                            value: typeof responseMetrics.readability === 'number' ? Math.round(responseMetrics.readability) : 0, 
+                            color: '#F59E0B' 
+                          }
+                        ]}
+                        margin={{ top: 5, right: 15, left: 10, bottom: 5 }}
+                      >
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="metric" tick={{ fontSize: 10 }} />
+                        <YAxis domain={[0, 100]} tick={{ fontSize: 10 }} />
+                        <Tooltip 
+                          formatter={(value) => [`${value}%`, 'Score']}
+                          labelStyle={{ color: '#374151', fontSize: '12px' }}
+                        />
+                        <Bar dataKey="value" fill="#3B82F6" radius={[2, 2, 0, 0]} />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </div>
+
+                  {/* Radar Chart */}
+                  <div className="bg-gray-50 rounded-md p-2">
+                    <h4 className="text-xs font-semibold text-gray-700 mb-1">Performance Radar</h4>
+                    <ResponsiveContainer width="100%" height={150}>
+                      <RadarChart
+                        data={[
+                          { 
+                            metric: 'Quality', 
+                            value: typeof responseMetrics.quality === 'number' ? Math.round(responseMetrics.quality) : 0 
+                          },
+                          { 
+                            metric: 'Creativity', 
+                            value: typeof responseMetrics.creativity === 'number' ? Math.round(responseMetrics.creativity) : 0 
+                          },
+                          { 
+                            metric: 'Coherence', 
+                            value: typeof responseMetrics.coherence === 'number' ? Math.round(responseMetrics.coherence) : 0 
+                          },
+                          { 
+                            metric: 'Readability', 
+                            value: typeof responseMetrics.readability === 'number' ? Math.round(responseMetrics.readability) : 0 
+                          }
+                        ]}
+                        margin={{ top: 10, right: 40, bottom: 10, left: 40 }}
+                      >
+                        <PolarGrid />
+                        <PolarAngleAxis dataKey="metric" tick={{ fontSize: 10 }} />
+                        <PolarRadiusAxis angle={90} domain={[0, 100]} tick={{ fontSize: 10 }} />
+                        <Radar
+                          name="Metrics"
+                          dataKey="value"
+                          stroke="#3B82F6"
+                          fill="#3B82F6"
+                          fillOpacity={0.3}
+                          strokeWidth={2}
+                        />
+                        <Tooltip 
+                          formatter={(value) => [`${value}%`, 'Score']}
+                          labelStyle={{ color: '#374151', fontSize: '12px' }}
+                        />
+                      </RadarChart>
+                    </ResponsiveContainer>
+                  </div>
+                </div>
               </div>
             </div>
           )}
