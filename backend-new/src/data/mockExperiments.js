@@ -1,0 +1,135 @@
+// Mock experiments data
+const mockExperiments = [
+  {
+    id: 1,
+    name: "Creative Writing Analysis",
+    description: "Testing optimal parameters for creative content generation across multiple temperature and top_p values",
+    prompt: "Write a creative short story about artificial intelligence discovering emotions for the first time. The story should be engaging, original, and thought-provoking.",
+    model: "gpt-4",
+    parameters: {
+      temperature: 0.8,
+      top_p: 0.9,
+      max_tokens: 1000,
+      frequency_penalty: 0.0,
+      presence_penalty: 0.0
+    },
+    status: "completed",
+    response_count: 5,
+    average_quality: 89.5,
+    best_quality: 94.2,
+    worst_quality: 82.1,
+    total_cost: 0.045,
+    total_tokens: 4200,
+    average_response_time: 2.3,
+    created_at: "2024-10-29T10:00:00.000Z",
+    updated_at: "2024-10-29T10:30:00.000Z",
+    tags: ["creative", "writing", "ai"],
+    user_id: 1
+  },
+  {
+    id: 2,
+    name: "Technical Documentation Test",
+    description: "Testing parameters for technical writing and explanation tasks with focus on clarity and accuracy",
+    prompt: "Explain the concept of neural networks in simple terms that a beginner can understand, including key components and how they work.",
+    model: "gpt-4",
+    parameters: {
+      temperature: 0.3,
+      top_p: 0.8,
+      max_tokens: 800,
+      frequency_penalty: 0.0,
+      presence_penalty: 0.0
+    },
+    status: "completed",
+    response_count: 3,
+    average_quality: 91.2,
+    best_quality: 95.1,
+    worst_quality: 87.8,
+    total_cost: 0.024,
+    total_tokens: 2100,
+    average_response_time: 1.8,
+    created_at: "2024-10-28T14:20:00.000Z",
+    updated_at: "2024-10-28T14:45:00.000Z",
+    tags: ["technical", "explanation", "neural-networks"],
+    user_id: 1
+  },
+  {
+    id: 3,
+    name: "Conversational AI Testing",
+    description: "Evaluating different models for conversational responses and dialogue quality",
+    prompt: "You are a helpful AI assistant. A user asks: 'I'm feeling overwhelmed with work and don't know how to manage my time better. Can you help me?' Provide a supportive and practical response.",
+    model: "claude-3.5-sonnet",
+    parameters: {
+      temperature: 0.7,
+      top_p: 0.9,
+      max_tokens: 600,
+      frequency_penalty: 0.1,
+      presence_penalty: 0.1
+    },
+    status: "running",
+    response_count: 2,
+    average_quality: 86.7,
+    best_quality: 88.4,
+    worst_quality: 85.0,
+    total_cost: 0.018,
+    total_tokens: 1200,
+    average_response_time: 2.1,
+    created_at: "2024-10-30T09:15:00.000Z",
+    updated_at: "2024-10-30T09:45:00.000Z",
+    tags: ["conversational", "support", "advice"],
+    user_id: 1
+  },
+  {
+    id: 4,
+    name: "Code Generation Analysis",
+    description: "Testing LLM capabilities for generating clean, well-documented code",
+    prompt: "Create a Python function that implements a binary search algorithm. Include proper documentation, error handling, and example usage.",
+    model: "gpt-4",
+    parameters: {
+      temperature: 0.2,
+      top_p: 0.8,
+      max_tokens: 1200,
+      frequency_penalty: 0.0,
+      presence_penalty: 0.0
+    },
+    status: "completed",
+    response_count: 4,
+    average_quality: 92.8,
+    best_quality: 96.3,
+    worst_quality: 88.2,
+    total_cost: 0.048,
+    total_tokens: 4800,
+    average_response_time: 2.5,
+    created_at: "2024-10-27T16:30:00.000Z",
+    updated_at: "2024-10-27T17:00:00.000Z",
+    tags: ["coding", "python", "algorithms"],
+    user_id: 1
+  },
+  {
+    id: 5,
+    name: "Marketing Copy Optimization",
+    description: "Comparing different parameter settings for generating compelling marketing content",
+    prompt: "Write compelling marketing copy for a new eco-friendly smartphone that lasts 3 days on a single charge. Focus on environmental benefits and convenience.",
+    model: "claude-3.5-sonnet",
+    parameters: {
+      temperature: 0.9,
+      top_p: 0.95,
+      max_tokens: 500,
+      frequency_penalty: 0.2,
+      presence_penalty: 0.1
+    },
+    status: "pending",
+    response_count: 0,
+    average_quality: 0,
+    best_quality: 0,
+    worst_quality: 0,
+    total_cost: 0,
+    total_tokens: 0,
+    average_response_time: 0,
+    created_at: "2024-10-30T11:00:00.000Z",
+    updated_at: "2024-10-30T11:00:00.000Z",
+    tags: ["marketing", "copywriting", "eco-friendly"],
+    user_id: 1
+  }
+];
+
+module.exports = mockExperiments;
