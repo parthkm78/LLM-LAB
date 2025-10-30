@@ -37,7 +37,7 @@ const ExperimentHistory = () => {
   const experiments = [
     {
       id: 'exp_001',
-      name: 'Creative Writing Optimization',
+      name: 'Response Quality  Optimization',
       type: 'single',
       model: 'GPT-4',
       prompt: 'Write a compelling short story about AI discovering emotions...',

@@ -27,7 +27,7 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
   // Mock comprehensive batch results data
   const batchData = {
     id: batchId || 'batch_001',
-    name: 'Creative Writing Parameter Optimization',
+    name: 'Response Quality  Parameter Optimization',
     prompt: 'Write a compelling short story about artificial intelligence discovering emotions for the first time.',
     model: 'GPT-4',
     status: 'completed',
@@ -430,7 +430,7 @@ const BatchResultsAnalysis = ({ batchId, onBack }) => {
               <div className="text-sm text-yellow-800">
                 <p className="mb-2">Use these parameters for:</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Creative writing</li>
+                  <li>Response Quality </li>
                   <li>Storytelling</li>
                   <li>Narrative content</li>
                 </ul>

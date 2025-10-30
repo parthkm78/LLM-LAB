@@ -76,7 +76,7 @@ GET /api/experiments
     "experiments": [
       {
         "id": 1,
-        "name": "Creative Writing Optimization",
+        "name": "Response Quality  Optimization",
         "description": "Testing parameters for creative content generation",
         "type": "single",
         "status": "completed",
@@ -129,7 +129,7 @@ GET /api/experiments/:id
   "data": {
     "experiment": {
       "id": 1,
-      "name": "Creative Writing Optimization",
+      "name": "Response Quality  Optimization",
       "description": "Testing parameters for creative content generation",
       "type": "single",
       "status": "completed",
@@ -189,8 +189,8 @@ POST /api/experiments
 **Request Body:**
 ```json
 {
-  "name": "Creative Writing Test",
-  "description": "Testing creative writing parameters",
+  "name": "Response Quality  Test",
+  "description": "Testing Response Quality  parameters",
   "type": "single",
   "model": "gpt-4",
   "prompt": "Write a short story about AI discovering emotions",
@@ -225,7 +225,7 @@ POST /api/experiments
   "data": {
     "experiment": {
       "id": 1248,
-      "name": "Creative Writing Test",
+      "name": "Response Quality  Test",
       "status": "draft",
       "created_at": "2024-10-30T11:30:00Z"
       // ... full experiment object
@@ -467,8 +467,8 @@ POST /api/batch-experiments
 **Request Body:**
 ```json
 {
-  "name": "Creative Writing Parameter Sweep",
-  "description": "Testing multiple parameter combinations for creative writing",
+  "name": "Response Quality  Parameter Sweep",
+  "description": "Testing multiple parameter combinations for Response Quality ",
   "prompt": "Write a compelling short story about AI discovering emotions",
   "model": "gpt-4",
   "parameter_grid": {
@@ -498,7 +498,7 @@ POST /api/batch-experiments
   "data": {
     "batch_experiment": {
       "id": 42,
-      "name": "Creative Writing Parameter Sweep",
+      "name": "Response Quality  Parameter Sweep",
       "status": "queued",
       "total_combinations": 20,
       "total_responses": 60,
@@ -523,7 +523,7 @@ GET /api/batch-experiments/:id
   "data": {
     "batch_experiment": {
       "id": 42,
-      "name": "Creative Writing Parameter Sweep",
+      "name": "Response Quality  Parameter Sweep",
       "status": "running",
       "progress": {
         "completed_combinations": 12,
@@ -657,7 +657,7 @@ GET /api/batch-experiments
     "batch_experiments": [
       {
         "id": 42,
-        "name": "Creative Writing Parameter Sweep",
+        "name": "Response Quality  Parameter Sweep",
         "status": "completed",
         "progress": 100,
         "total_combinations": 20,
@@ -881,7 +881,7 @@ GET /api/analytics/dashboard
       {
         "type": "experiment_completed",
         "experiment_id": 1247,
-        "name": "Creative Writing Test",
+        "name": "Response Quality  Test",
         "quality": 94.2,
         "timestamp": "2024-10-30T11:45:00Z"
       }
@@ -1000,7 +1000,7 @@ GET /api/responses/comparison
       {
         "id": 445,
         "experiment_id": 1,
-        "experiment_name": "Creative Writing Test",
+        "experiment_name": "Response Quality  Test",
         "content": "Once upon a time...",
         "content_preview": "Once upon a time in a digital realm...",
         "model": "gpt-4",
@@ -1110,7 +1110,7 @@ GET /api/experiments/history
     "experiments": [
       {
         "id": 1,
-        "name": "Creative Writing Optimization",
+        "name": "Response Quality  Optimization",
         "type": "single",
         "status": "completed",
         "model": "gpt-4",

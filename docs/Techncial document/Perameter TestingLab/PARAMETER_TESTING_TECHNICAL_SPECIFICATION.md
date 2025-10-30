@@ -118,7 +118,7 @@ function calculateParameterInteraction(parameters) {
 }
 
 function getRecommendation(creativity, consistency) {
-  if (creativity > 0.7 && consistency < 0.5) return "Creative Writing";
+  if (creativity > 0.7 && consistency < 0.5) return "Response Quality ";
   if (creativity < 0.3 && consistency > 0.7) return "Technical Documentation";
   if (creativity > 0.5 && consistency > 0.5) return "Balanced Content";
   return "General Purpose";
@@ -132,7 +132,7 @@ function getRecommendation(creativity, consistency) {
 const parameterPresets = [
   {
     id: 'creative',
-    name: 'Creative Writing',
+    name: 'Response Quality ',
     description: 'High creativity, diverse vocabulary',
     icon: '🎨',
     color: 'from-pink-500 to-rose-500',

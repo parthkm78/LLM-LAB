@@ -69,11 +69,11 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
     return () => clearInterval(timer);
   }, []);
 
-  // Comprehensive Creative Writing Analysis Data
+  // Comprehensive Response Quality Analysis Data
   const analysisData = {
     experiment: {
       id: 1,
-      name: "Creative Writing Analysis - Advanced Report",
+      name: "Response Quality Analysis - Advanced Report",
       description: "Deep analysis of AI creativity patterns, emotional resonance, and narrative structure across 8 generated stories",
       prompt: "Write a creative short story about artificial intelligence discovering emotions for the first time. The story should be engaging, original, and thought-provoking.",
       model: "gpt-4",
@@ -603,13 +603,13 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
                 <div>
                   <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/15 backdrop-blur-sm border border-white/20 text-white text-xs font-medium mb-2">
                     <SparklesIcon className="w-4 h-4 mr-1.5" />
-                    Creative Analysis Lab
+                    Advanced Analysis Lab
                   </div>
                   <h1 className="text-xl md:text-2xl font-bold text-white mb-1">
-                    Creative Writing Analysis
+                    Response Quality Analysis
                   </h1>
                   <p className="text-white/90 text-sm max-w-2xl">
-                    AI-powered analysis of creative content with advanced metrics
+                    AI-powered analysis of response content with advanced metrics
                   </p>
                 </div>
               </div>
@@ -628,7 +628,7 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
             <div className="grid grid-cols-5 gap-2">
               <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-2 text-center">
                 <div className="text-lg font-black text-white mb-0.5">8</div>
-                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Stories</div>
+                <div className="text-xs font-medium text-white/80 uppercase tracking-wide">Responses</div>
               </div>
               <div className="bg-white/15 backdrop-blur-sm rounded-lg border border-white/20 p-2 text-center">
                 <div className="text-lg font-black text-white mb-0.5">97%</div>
@@ -657,9 +657,9 @@ const AdvancedCreativeAnalysis = ({ onBack }) => {
           <div className="flex items-center space-x-1 bg-white/80 backdrop-blur-sm rounded-xl p-1 border border-blue-200/50 shadow-lg">
             {[
               { id: 'overview', label: 'Overview', icon: ChartBarIcon },
-              { id: 'stories', label: 'Stories', icon: BookOpenIcon },
+              { id: 'stories', label: 'Responses', icon: BookOpenIcon },
               { id: 'parameters', label: 'Parameters', icon: AdjustmentsHorizontalIcon },
-              { id: 'insights', label: 'Insights', icon: BulbIcon },
+            //   { id: 'insights', label: 'Insights', icon: BulbIcon },
               { id: 'comparison', label: 'Compare', icon: ArrowsUpDownIcon }
             ].map((tab) => {
               const Icon = tab.icon;

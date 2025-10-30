@@ -106,7 +106,7 @@ const BatchExperiments = () => {
   const [batchJobs, setBatchJobs] = useState([
     {
       id: 1,
-      name: 'Creative Writing Analysis',
+      name: 'Response Quality  Analysis',
       description: 'Testing optimal parameters for creative content generation across multiple temperature and top_p values',
       status: 'completed',
       progress: 100,
@@ -137,7 +137,7 @@ const BatchExperiments = () => {
       insights: [
         'Higher temperature (0.8-0.9) significantly improves creativity scores',
         'Top_p values above 0.85 show diminishing returns on quality',
-        'Sweet spot identified: temperature=0.8, top_p=0.9 for creative writing',
+        'Sweet spot identified: temperature=0.8, top_p=0.9 for Response Quality ',
         'Max tokens between 1000-1500 provide optimal completeness'
       ]
     },
@@ -1014,7 +1014,7 @@ const BatchExperiments = () => {
                         type="text"
                         value={batchConfig.name}
                         onChange={(e) => setBatchConfig(prev => ({ ...prev, name: e.target.value }))}
-                        placeholder="e.g., Creative Writing Analysis"
+                        placeholder="e.g., Response Quality  Analysis"
                         className="w-full px-3 py-2.5 border border-blue-200 rounded-lg bg-white/90 backdrop-blur-sm text-sm focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 shadow-sm"
                       />
                     </div>

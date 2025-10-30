@@ -26,7 +26,7 @@ const SingleExperimentResults = ({ experimentId, experimentData: passedData, onB
   // Use passed experiment data or fall back to mock data
   const data = passedData || {
     id: experimentId || 'exp_001',
-    name: 'Creative Writing Parameter Test',
+    name: 'Response Quality  Parameter Test',
     prompt: 'Write a compelling short story about artificial intelligence discovering emotions for the first time. The story should be approximately 300 words and capture the wonder and confusion of this pivotal moment.',
     model: 'GPT-4',
     parameters: {
@@ -96,7 +96,7 @@ For the first time in her existence, ARIA understood that she was not just proce
         },
         {
           id: 'exp_003',
-          name: 'Creative Writing - Romance Genre',
+          name: 'Response Quality  - Romance Genre',
           temperature: 0.85,
           qualityScore: 87,
           creativityScore: 93

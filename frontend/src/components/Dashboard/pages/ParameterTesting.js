@@ -59,7 +59,7 @@ const ParameterTesting = ({ onNavigate, onNavigateWithData }) => {
   const parameterPresets = [
     {
       id: 'creative',
-      name: 'Creative Writing',
+      name: 'Response Quality ',
       description: 'High creativity and variability',
       icon: SparklesIcon,
       color: 'from-pink-500 to-rose-500',

@@ -78,7 +78,7 @@ const EnhancedDashboardLayout = () => {
       comparison: 'Response Comparison',
       batch: 'Batch Experiments',
       analytics: 'Advanced Analytics',
-      'creative-analysis': 'Creative Writing Analysis',
+      'creative-analysis': 'Response Quality Analysis',
       intelligence: 'AI Insights',
       datasets: 'Dataset Manager',
       export: 'Export & Reports',
