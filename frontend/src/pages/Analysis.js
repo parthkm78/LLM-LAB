@@ -9,8 +9,7 @@ import {
 import Card from '../components/Card';
 import MetricsChart from '../components/MetricsChart';
 import Button from '../components/Button';
-// API imports removed to prevent localhost:5000 calls - using mock data instead
-// import { experimentsAPI, healthCheck } from '../services/api';
+import { experimentsAPI, healthCheck } from '../services/api';
 
 const Analysis = () => {
   const [selectedTimeRange, setSelectedTimeRange] = useState('7d');
@@ -20,24 +19,18 @@ const Analysis = () => {
   useEffect(() => {
     const loadAnalytics = async () => {
       try {
-        // Mock data instead of API calls to prevent localhost:5000 calls
-        await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
-        
-        const mockExperiments = [
-          { id: 1, name: "GPT-4 Testing", status: "completed", responses_count: 25 },
-          { id: 2, name: "Claude Comparison", status: "running", responses_count: 15 }
-        ];
-        
-        const mockStats = {
-          experiments_count: 15,
-          responses_count: 450,
-          avg_quality_score: 8.3,
-          success_rate: 95
-        };
+        // Get real data from backend
+        const [experimentsResponse, healthResponse] = await Promise.all([
+          experimentsAPI.getAll(),
+          healthCheck()
+        ]);
 
-        // Calculate analytics from mock data
-        const totalExperiments = mockStats.experiments_count || mockExperiments.length || 0;
-        const totalResponses = mockStats.responses_count || 0;
+        const experiments = experimentsResponse.data?.experiments || [];
+        const stats = healthResponse.statistics || {};
+
+        // Calculate analytics from real data
+        const totalExperiments = stats.experiments_count || experiments.length || 0;
+        const totalResponses = stats.responses_count || 0;
         
         // Calculate average temperature from experiments
         const avgTemp = experiments.length > 0 

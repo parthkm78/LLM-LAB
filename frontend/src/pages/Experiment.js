@@ -14,8 +14,7 @@ import Button from '../components/Button';
 import Input from '../components/Input';
 import Card from '../components/Card';
 import LoadingSpinner from '../components/LoadingSpinner';
-// API imports removed to prevent localhost:5000 calls - using mock data instead
-// import { experimentsAPI, responsesAPI } from '../services/api';
+import { experimentsAPI, responsesAPI } from '../services/api';
 
 const Experiment = () => {
   const [isRunning, setIsRunning] = useState(false);

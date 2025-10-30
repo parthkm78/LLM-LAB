@@ -24,10 +24,8 @@ const EnhancedDashboardLayout = () => {
   const [currentExperimentData, setCurrentExperimentData] = useState(null);
 
   const handleNavigateWithData = (section, experimentData = null) => {
-    console.log('handleNavigateWithData called with:', { section, experimentData });
     setCurrentExperimentData(experimentData);
     setActiveSection(section);
-    console.log('Navigation completed - activeSection set to:', section);
   };
 
   const renderActiveSection = () => {
@@ -80,7 +78,7 @@ const EnhancedDashboardLayout = () => {
       comparison: 'Response Comparison',
       batch: 'Batch Experiments',
       analytics: 'Advanced Analytics',
-      'creative-analysis': 'Response Quality Analysis',
+      'creative-analysis': 'Creative Writing Analysis',
       intelligence: 'AI Insights',
       datasets: 'Dataset Manager',
       export: 'Export & Reports',

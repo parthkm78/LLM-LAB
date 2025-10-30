@@ -18,8 +18,7 @@ import Input from '../components/Input';
 import Card from '../components/Card';
 import LoadingSpinner from '../components/LoadingSpinner';
 import ProgressBar from '../components/ProgressBar';
-// API removed to prevent localhost:5000 calls - using mock data instead
-// import api from '../services/api';
+import api from '../services/api';
 
 const NewExperiment = () => {
   const navigate = useNavigate();
@@ -69,21 +68,8 @@ const NewExperiment = () => {
     setIsCreating(true);
     
     try {
-      // Mock API response - no localhost:5000 call
-      await new Promise(resolve => setTimeout(resolve, 500)); // Simulate delay
-      const mockResponse = {
-        data: {
-          experiment: {
-            id: Date.now(),
-            name: experimentData.name,
-            description: experimentData.description,
-            status: 'created',
-            created_at: new Date().toISOString(),
-            ...experimentData
-          }
-        }
-      };
-      setCreatedExperiment(mockResponse.data.experiment);
+      const response = await api.post('/experiments', experimentData);
+      setCreatedExperiment(response.data.experiment);
       toast.success('Experiment created successfully!');
     } catch (error) {
       console.error('Error creating experiment:', error);
@@ -111,26 +97,9 @@ const NewExperiment = () => {
         });
       }, 500);
 
-      const response = await new Promise(resolve => {
-        // Mock API response - no localhost:5000 call
-        setTimeout(() => {
-          resolve({
-            data: {
-              summary: {
-                total_generated: 10,
-                successful: 10,
-                failed: 0
-              },
-              responses: Array(10).fill(0).map((_, i) => ({
-                id: i + 1,
-                text: `Mock response ${i + 1} generated for experiment`,
-                model: i % 2 === 0 ? 'gpt-4' : 'claude-3.5-sonnet',
-                quality_score: Math.random() * 2 + 8,
-                created_at: new Date().toISOString()
-              }))
-            }
-          });
-        }, 2000);
+      const response = await api.post('/responses/generate', {
+        experiment_id: createdExperiment.id,
+        generate_all: true
       });
       
       clearInterval(progressInterval);

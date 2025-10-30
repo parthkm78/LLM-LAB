@@ -228,28 +228,6 @@ const ParameterTesting = ({ onNavigate, onNavigateWithData }) => {
       
       console.log('Response data structure:', responseData);
       
-      // Always try to navigate regardless of response structure
-      console.log('About to navigate to creative-analysis');
-      console.log('onNavigateWithData function exists:', !!onNavigateWithData);
-      
-      if (onNavigateWithData) {
-        // Create basic experiment data for navigation
-        const basicExperimentData = {
-          id: experiment.id,
-          name: experiment.name,
-          prompt: testPrompt,
-          model: currentParameters.model || 'gpt-3.5-turbo',
-          parameters: currentParameters,
-          mock_mode: responseData.mock_mode || experiment.mock_mode || false
-        };
-        
-        console.log('Calling onNavigateWithData with basic data...');
-        onNavigateWithData('creative-analysis', basicExperimentData);
-        success(`Response generated successfully! ${responseData.mock_mode ? '(Using mock mode)' : ''}`);
-        console.log('Navigation call completed');
-        return; // Exit early after navigation
-      }
-      
       if (responseData.results && responseData.results.length > 0) {
         const response = responseData.results[0]; // Get first response
         
@@ -331,9 +309,15 @@ const ParameterTesting = ({ onNavigate, onNavigateWithData }) => {
           }
         };
         
-        // Set the metrics and response for display in current page if needed
-        setResponseMetrics(finalMetrics);
-        setGeneratedResponse(content);
+        // Navigate directly to creative analysis page
+        if (onNavigateWithData) {
+          onNavigateWithData('creative-analysis', experimentDataForAnalysis);
+          success(`Response generated successfully! ${responseData.mock_mode ? '(Using mock mode)' : ''}`);
+        } else {
+          // Fallback: set response in current page
+          setResponseMetrics(finalMetrics);
+          success('Response generated successfully! View results below.');
+        }
       }
       
     } catch (err) {
