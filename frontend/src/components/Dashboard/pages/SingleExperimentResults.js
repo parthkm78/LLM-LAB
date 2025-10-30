@@ -20,11 +20,11 @@ import {
 } from '@heroicons/react/24/outline';
 import { designTokens, getQualityColor, getParameterColor } from '../../../styles/designTokens';
 
-const SingleExperimentResults = ({ experimentId, onBack }) => {
+const SingleExperimentResults = ({ experimentId, experimentData: passedData, onBack }) => {
   const [activeTab, setActiveTab] = useState('overview');
 
-  // Mock detailed experiment data
-  const experimentData = {
+  // Use passed experiment data or fall back to mock data
+  const data = passedData || {
     id: experimentId || 'exp_001',
     name: 'Creative Writing Parameter Test',
     prompt: 'Write a compelling short story about artificial intelligence discovering emotions for the first time. The story should be approximately 300 words and capture the wonder and confusion of this pivotal moment.',
@@ -109,6 +109,9 @@ For the first time in her existence, ARIA understood that she was not just proce
       }
     }
   };
+  
+  // Use the data variable for all references
+  const experimentData = data;
 
   const tabs = [
     { id: 'overview', name: 'Overview', icon: DocumentTextIcon },
@@ -540,6 +543,14 @@ For the first time in her existence, ARIA understood that she was not just proce
                 <span>Quality: {experimentData.metrics.overall_quality}%</span>
                 <span>•</span>
                 <span>{new Date(experimentData.response.timestamp).toLocaleString()}</span>
+                {experimentData.mock_mode && (
+                  <>
+                    <span>•</span>
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 border border-orange-200">
+                      Mock Mode
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>

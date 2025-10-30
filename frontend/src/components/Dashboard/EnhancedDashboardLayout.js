@@ -15,11 +15,18 @@ import DashboardSettings from './pages/DashboardSettings';
 import SingleExperimentResults from './pages/SingleExperimentResults';
 import BatchResultsAnalysis from './pages/BatchResultsAnalysis';
 import ExperimentHistory from './pages/ExperimentHistory';
+import AdvancedCreativeAnalysis from './pages/AdvancedCreativeAnalysis';
 
 const EnhancedDashboardLayout = () => {
   const [activeSection, setActiveSection] = useState('overview');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [currentExperimentData, setCurrentExperimentData] = useState(null);
+
+  const handleNavigateWithData = (section, experimentData = null) => {
+    setCurrentExperimentData(experimentData);
+    setActiveSection(section);
+  };
 
   const renderActiveSection = () => {
     switch (activeSection) {
@@ -27,7 +34,7 @@ const EnhancedDashboardLayout = () => {
       case 'recent':
         return <DashboardOverview section={activeSection} />;
       case 'parameters':
-        return <ParameterTesting />;
+        return <ParameterTesting onNavigate={setActiveSection} onNavigateWithData={handleNavigateWithData} />;
       case 'quality':
         return <QualityMetrics />;
       case 'comparison':
@@ -35,7 +42,9 @@ const EnhancedDashboardLayout = () => {
       case 'batch':
         return <BatchExperiments />;
       case 'analytics':
-        return <AdvancedAnalytics />;
+        return <AdvancedAnalytics experimentData={currentExperimentData} onBack={() => setActiveSection('parameters')} />;
+      case 'creative-analysis':
+        return <AdvancedCreativeAnalysis experimentData={currentExperimentData} onBack={() => setActiveSection('parameters')} />;
       case 'datasets':
         return <DatasetManager />;
       case 'models':
@@ -43,7 +52,7 @@ const EnhancedDashboardLayout = () => {
       case 'settings':
         return <DashboardSettings />;
       case 'single-results':
-        return <SingleExperimentResults />;
+        return <SingleExperimentResults experimentData={currentExperimentData} onBack={() => setActiveSection('parameters')} />;
       case 'batch-results':
         return <BatchResultsAnalysis />;
       case 'history':
@@ -69,6 +78,7 @@ const EnhancedDashboardLayout = () => {
       comparison: 'Response Comparison',
       batch: 'Batch Experiments',
       analytics: 'Advanced Analytics',
+      'creative-analysis': 'Creative Writing Analysis',
       intelligence: 'AI Insights',
       datasets: 'Dataset Manager',
       export: 'Export & Reports',
